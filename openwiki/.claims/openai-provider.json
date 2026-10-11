@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:05e90b9de166a5a7213cee462a99c10236b8c8eba605f2b5a856779baad552a6",
+  "pageVersion": "sha256:fdaa2d49d61aca7335a66a03840c38f852c9b1508bb1a61c76a6b9432f804ad6",
   "claims": [
     {
       "id": "claim_347664eb68464142b558791c7a95093f",
@@ -8,7 +8,7 @@
       "evidence": [
         {
           "resource": "repo://libs/partners/openai/langchain_openai/__init__.py",
-          "version": "repo-file-v1:sha256:d08e06dea1f954a477fa8951e2a8387a10396d07b92a3a60fdced307c136a84f"
+          "version": "repo-file-v1:sha256:5673ccbe8f53267c2027dd390051424928a6e1e744c2f8c8a418960a29dccf4d"
         },
         {
           "resource": "repo://libs/partners/openai/langchain_openai/chat_models/base.py#L2904-L4266",
@@ -255,10 +255,74 @@
           "version": "repo-lines-v1:sha256:4796c14704f049c8340f8cb74976a7f9e7af36bb8fbf9250e8c163d7a4124e0d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwYWIyNjQwNjA4YTZlZGJhZGE4MDJlYTdlYzA1NjYxM2JhOTFhY2Q5ZTdhOGIwZjcxOGRmODQ1Yjg4YzBlMDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliY2FkYzRlMjljMmM0NWUyOTI5NjcwZmZiNGJiNDZiY2JjNDRlYWIzNTAyNzAzNWJmNDVmYjFiMTdiYzU1ZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjhhODNkNzQxZTM3NWRlNGMzMWI3Yzc4Mzg3YzdjN2UyNzUxZWY4NTU5MWE3ZWE3ZjkwYzNmN2E3NTQ5NTQ0ZmUifQ"
         }
       ]
+    },
+    {
+      "id": "claim_3d7e4bea4efc4993b65125ca0fac282c",
+      "statement": "OpenAIDecisions is a RunnableSerializable that wraps OpenAI's Decisions API for classification tasks, accepting Predicate questions (probability), Choice selections (routing with confidence), and Score ratings (ordered levels). It returns DecisionResponse with probabilities, confidence scores, and token usage. Input State can be strings, HumanMessages with images, or complex objects converted to JSON.",
+      "evidence": [
+        {
+          "resource": "repo://libs/partners/openai/langchain_openai/decisions/base.py#L37-L101",
+          "version": "repo-lines-v1:sha256:a6bf2c815db13ab72ff35424e25cb3b9a14e911101fe7ef8d6171c737170e5d6:eyJzZWxlY3RlZExpbmVDb3VudCI6NjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5NDA2YWZiY2ZlNjYyMTgxOGU1M2E3OWU2NzU5MzYxNTAxNmE0Y2IyZWUzYTI2M2U5MGYwNDlmZDU4ZGNiOWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2YTcxNTI1NzJlZTg0ZjEwOTA2Yzc0YjlmMmE5MjQzNGRkYWIwZTNjNDI4MTNiMDRlNTk3ZWZjZWM5NTFiMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjYyMDA5N2U0YWE1MDA2OGJhMTU3ZjlhMjczOWZhZDg2OTk1ZTFlMGNkY2NkYWRjNTg5N2MyMDM0Yzc0ZDNlZmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA3NTNiMzhkNDU5NzEzZDllNDI0NTJlZmQzMzQ0NWM4NzZlNTc1YWJlNzFjYjdjMmRjNzE5ZTg0NGY0MDRiYTMifQ"
+        },
+        {
+          "resource": "repo://libs/partners/openai/langchain_openai/decisions/types.py#L23-L120",
+          "version": "repo-lines-v1:sha256:af1da1de96f019ec827f943a585471e047c2f35bab89d2b2db83173e04e79b8d:eyJzZWxlY3RlZExpbmVDb3VudCI6OTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzMDZlODY3YjU5YmRiZDA5ZmM5ZWYzYWU4OGVkZGFlOTY3YjhkNjZmYTQzYjQ0OGZiYjQ4YzI4NmMzYmQ0MmYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1NzNlMWM3ODAyNjRhZWI3NjRiYWUxMzZiOTU2MDY1MTM1MGM3ZWNjMmQzYTMwZTcyYjcyM2QxZmU5ZTU2NTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgwZDM3NjFlNzk1YjA2M2FkODhjZGZkYmQzNzZmYTFjZTJlMmU3YjhmOGNjOWE0ODkxMDA0YzUzNmE0ODMzYzMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_801aa589f631432ebca404363eec9608",
+      "statement": "Predicate returns probability (0-1) of a condition; Choice selects one value from unordered options with per-option probabilities and overall confidence; Score rates against ordered levels (0, 1, 2...) with probability-weighted average. All support custom instructions and optional reasoning in responses.",
+      "evidence": [
+        {
+          "resource": "repo://libs/partners/openai/langchain_openai/decisions/types.py#L34-L156",
+          "version": "repo-lines-v1:sha256:825e67c86ec0f80d169e33b410eeebdb92c356af645587623190127047d377b7:eyJzZWxlY3RlZExpbmVDb3VudCI6MTIzLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJlMGZkM2RiM2QzOGUyOTNhNzc1ODIzOWY2YjVhMmUyOWYzOGJmZGMxNDRjMzMyNTM3YjA4MmY4NTk2NWVjMTQ2IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI5MWNhN2FiYjc4NzM3NjU2NTg0MTc0ZTY3MjBiMGI5NTBlNzZlNGQ5ZDYyZTI3YTgyYmFjZGNiODRlYjU2ZGE0IiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiIzOGFlNjBhMDlhNzg0YjQ3ZWEwODUzMTZiZmY5MmM2ODAxMWRkNjcwZDg5ZjI4ZGFmNWRhOWJiNmFlNDFiYzQyIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI1N2JkNjZlYjg2OWMxOTA5MGNiNzg2MDcwZGY4ZDYwNWY3MWQ3MzdhNDMxM2VlN2Q5ZmIxOWNjZDFmOWI5ZmUzIn0"
+        }
+      ]
+    },
+    {
+      "id": "claim_2f56683799364354a9a7dccfe22d8932",
+      "statement": "OpenAIAutoModeMiddleware intercepts and classifies explicitly configured tools as risky before execution using Decisions API Predicate questions. Tools with risk probability >= 0.5 are blocked; others execute normally. Tools not listed bypass classification. Fails closed: refusals and classification errors prevent tool execution.",
+      "evidence": [
+        {
+          "resource": "repo://libs/partners/openai/langchain_openai/middleware/auto_mode.py#L64-L147",
+          "version": "repo-lines-v1:sha256:c3542f1e7cd44173b18cefb3d322442954e609e0389f79dd1725a67a00829c77:eyJzZWxlY3RlZExpbmVDb3VudCI6ODQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5NDA2YWZiY2ZlNjYyMTgxOGU1M2E3OWU2NzU5MzYxNTAxNmE0Y2IyZWUzYTI2M2U5MGYwNDlmZDU4ZGNiOWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5OGIwNjNkOWI0N2U2NTM3OTYyNTU3MmNjZTE5NzY2OWQ1NzY3ZTEyYzE4YmUwNzU2NTJiOGNkOTgxY2U4ZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImYxZGU2ZWE4ZTA1MmFmMWY2ODRmYmE0NzUxNTgwNGZjZWJjZDExNTBiNDM3YjUyNWJjMjQyZDgxNGNiZTBiZWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_b0bf9f6a4fd64cac9ad8856775bf9448",
+      "statement": "OpenAIModelRouterMiddleware routes requests to different models using Decisions API Choice questions. Evaluates latest human message, selects model route based on task complexity/cost/capability, and stores full routing decision in agent state (choice name, probabilities dict, confidence score). Falls back to agent's base model if no route selected.",
+      "evidence": [
+        {
+          "resource": "repo://libs/partners/openai/langchain_openai/middleware/model_router.py#L80-L160",
+          "version": "repo-lines-v1:sha256:8107cd44997655b83df2486706071a470319943edd0adcc351bd573f1f27f7ca:eyJzZWxlY3RlZExpbmVDb3VudCI6ODEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ5NDA2YWZiY2ZlNjYyMTgxOGU1M2E3OWU2NzU5MzYxNTAxNmE0Y2IyZWUzYTI2M2U5MGYwNDlmZDU4ZGNiOWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmNzJhMzdkNWZjYWE3Y2Y1ODdlN2U5OTI1ZGM3OGMwMDdiM2YyMTY0OTZkMzAwZDJmZThlNzE5MjQ2YjZkYzciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjUxZmEzNDc0ZTgzOTkyY2VmMjRiMGFmNTM4ZmQzYTc1MGJjMDY5MGMxNWFiZGZiMWNkODY4MmJmMWNmOGY1NTIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkwNjM2ZGJkMzI5MDY4Yjg0MTJiNDdjZWI2YTNkY2Q2YzA5NTg1MTA0MDVkODdhZGVkMDkxYTVmMGFiODMyODYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c354107692084a7e8b12e19ced533d18",
+      "statement": "OpenAIModerationMiddleware performs content safety filtering using OpenAI's moderation API, detecting and flagging harmful content (violence, hate, sexual, self-harm) in inputs and outputs before model invocation or tool execution. Supports configurable severity thresholds and category filtering.",
+      "evidence": [
+        {
+          "resource": "repo://libs/partners/openai/langchain_openai/middleware/openai_moderation.py",
+          "version": "repo-file-v1:sha256:106088ecaa338daa234750c0f64296a7cfc02fd8627c4af08a503fee008940aa"
+        }
+      ]
+    },
+    {
+      "id": "claim_f129ec10da1048cfa02a12613e8dca41",
+      "statement": "convert_to_openai_data_block translates standard LangChain content blocks (image, file, audio) to OpenAI format, handling both Chat Completions API (image_url, file) and Responses API (input_image, input_file, input_audio) variants. Supports base64, URLs, file IDs, and data URIs with automatic format detection.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/messages/block_translators/openai.py#L58-L150",
+          "version": "repo-lines-v1:sha256:852fe62a60734adeaa6fd9a254d274a53b7923ea78f353d4687baf7f42d5fd43:eyJzZWxlY3RlZExpbmVDb3VudCI6OTMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyNjQ3NTExYjliZTFkNTdkYmZhZDY4MWI2NmQzNTkwMzgwZWMwMDUwZWFjZDRmZTYxYjY0YjYxNWI5MzQ2M2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVmZjk2ZTQwMjAwM2UwZDgxNDMyNTg3NjRlNmYyNjhjNjI1ZTA1ZmNmZWZiZDgwMzg5MDFhZDYxYzQ2MDI3YzAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJhYmE2NTBlZTE3MzdhZTk0NDUwMTUwZmNlNzBlYWE1MjU1ODU1NzUyZThlNWJhODIxNjJhYjBmZTdhOTZlZjMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY4YmYxOTQzY2ZjOWIwNDlkMmM0OGNlMTk0MWY1ZGVjYzc4ZjEwOWIxODg0ODZlODg0NDU2NTQ0YzViY2M3ZWEifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-28T08:35:20.640Z"
+    "at": "2026-10-11T08:26:15.994Z"
   }
 }

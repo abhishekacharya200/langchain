@@ -5,7 +5,7 @@ description: "MCPAdapter bridges MCP servers to LangChain agents, discovering to
 tags: [mcp, protocol, tools, adapter, integration, langgraph]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-28T08:35:20.640Z
+    at: 2026-10-11T08:26:15.994Z
 sources:
   - id: openwiki-source-6d1e3478d5b63988ee177552
     resource: repo://libs/langchain_v1/examples/mcp/auth_bearer.py

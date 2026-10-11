@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:4e5d2dc911c53cb5d796f0244aaee6dc3ae8591c91102231eb609ef62c10c4cb",
+  "pageVersion": "sha256:681a3b6ac3f7e9d4f853178c371fb3544ba3b3b67344030a127f6e0aa53d032f",
   "claims": [
     {
       "id": "claim_d872799ce6874d76b63667fe912b7616",
@@ -26,37 +26,37 @@
     },
     {
       "id": "claim_bf4afec1395b4acbbf413fe2928daab6",
-      "statement": "langchain-core (v1.6.5) provides the stable base abstractions including Runnable protocol, BaseChatModel, message types, tools, prompts, and callbacks.",
+      "statement": "langchain-core (v1.6.9) provides the stable base abstractions including Runnable protocol, BaseChatModel, message types, tools, prompts, and callbacks.",
       "evidence": [
         {
-          "resource": "repo://libs/core/langchain_core/language_models/chat_models.py#L1-L80",
-          "version": "repo-lines-v1:sha256:65a0c403c83c5df34f9fc75ad98dc0c9a24934c7d222476e9f7c20fc4c6b7d57:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE1ZDFjY2U5NjgzYzRiOGE0NjJhN2Q0NDBjYjk2ZGE3NDk3YWQ2NDYwNTE0ZjNkYWI0NDlmZjgzMzllYjY5ZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImZhZmJhMDUyN2MzOTUzYzRiNmUwZTViNTczOWJhODM2MTJmODA1M2JjZGM5NDY2NzMwMTkzY2QxZDU5MGI0MDgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQ5M2U5NDRhMjBlY2I2ZWEwODAyMzIzMTgyYzdmZGRlZDYxMDlhZThlMjI5OWU0YjRmZjlkM2I3NDRlMTI4YmEifQ"
+          "resource": "repo://libs/core/langchain_core/language_models/chat_models.py#L1-L100",
+          "version": "repo-lines-v1:sha256:4f1e3da37bc9fe8fe80f8f190e3d512dd39e16e5497af8e7136f3a6bf461e522:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJhNWQxY2NlOTY4M2M0YjhhNDYyYTdkNDQwY2I5NmRhNzQ5N2FkNjQ2MDUxNGYzZGFiNDQ5ZmY4MzM5ZWI2OWY0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiIwOWQ1MTkyYzY4MGU4MTRlY2QwMDIwMzI3ZjNmMjE0Zjk5MDBhZDJiMmNmMGI3NTA1MzM4M2NjYTcwYzAzNGE4In0"
         },
         {
-          "resource": "repo://libs/core/langchain_core/runnables/base.py#L1-L80",
-          "version": "repo-lines-v1:sha256:d49594cfb590cc026c40d913d290e5877978567c9a70f1c9f7cc0eb818fbbb30:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjY2UwMTU4YzI1NmU5OGViMGU2MDE2YmQ0NjFmMTY1NmRkNmNmOGM0NDg2MWYzMGQ1NzdlMGU0M2Q4OGJiYzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU2NmI0NWIxYmRiODdjNWE5YmE0ZWVlMjNhNWFlY2RlYjYxMDVmZWM4ZGM4YTEwY2I3YWY3MWU1NzVlOTBhMDciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFjZDY5MGU1NzI2MDE4MDhiMzdmYmU3YWFjYWU0NWQyZTNmYzczODMzNmMwNzUwYzgyYTYxOTg4NWRlMTdiZTEifQ"
+          "resource": "repo://libs/core/langchain_core/runnables/base.py#L1-L100",
+          "version": "repo-lines-v1:sha256:accf3b8621d86e3d635a847676a79db422698c758846aa8ca1d8bbede50e061c:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI2Y2NlMDE1OGMyNTZlOThlYjBlNjAxNmJkNDYxZjE2NTZkZDZjZjhjNDQ4NjFmMzBkNTc3ZTBlNDNkODhiYmMzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIzNjY3NjRkYmQ1MDU4ZDQyZjc3Y2M5NjU4YThhMDIyZjU0YTFmYTM1Y2FiODExN2I4OTc1YjAxYmIzOTY4YzExIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkZjQwNTRjMDZkZmQ1N2MzZDU5YTAwOTE5YzYyZDcwYWQ2OWU1NGJmNjYwMGQ0ZDQ3MTY1YjBiZTYzNjQ1OTU0In0"
         },
         {
           "resource": "repo://libs/core/pyproject.toml#L24-L24",
-          "version": "repo-lines-v1:sha256:341a73a1ff04d0266d8ca55a921f5e7a17e064312d5de57952ee36efd10e4712:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQxYTczYTFmZjA0ZDAyNjZkOGNhNTVhOTIxZjVlN2ExN2UwNjQzMTJkNWRlNTc5NTJlZTM2ZWZkMTBlNDcxMiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMzQxYTczYTFmZjA0ZDAyNjZkOGNhNTVhOTIxZjVlN2ExN2UwNjQzMTJkNWRlNTc5NTJlZTM2ZWZkMTBlNDcxMiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmRmYWFiMzNiMmUzYTUwMTM3NmZlODIxNDNkNzBmNmVkYjMyNWI4YWMzYWI5MDUwYTg0OTgwN2ZmM2FhZGI3NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGEyM2RmNzFkODljMGE5NmUzNWFhZjk1ZTdjZTllYTczYTRiN2FlZjQyNDZjN2Q3YzAzZjhlM2EwMTJiZjliNSJ9"
+          "version": "repo-lines-v1:sha256:8efd1ce578e5d9bbd9190fde5e3f15f40744490bb4f878a3f2586dccb6b01160:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOGVmZDFjZTU3OGU1ZDliYmQ5MTkwZmRlNWUzZjE1ZjQwNzQ0NDkwYmI0Zjg3OGEzZjI1ODZkY2NiNmIwMTE2MCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOGVmZDFjZTU3OGU1ZDliYmQ5MTkwZmRlNWUzZjE1ZjQwNzQ0NDkwYmI0Zjg3OGEzZjI1ODZkY2NiNmIwMTE2MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmRmYWFiMzNiMmUzYTUwMTM3NmZlODIxNDNkNzBmNmVkYjMyNWI4YWMzYWI5MDUwYTg0OTgwN2ZmM2FhZGI3NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGEyM2RmNzFkODljMGE5NmUzNWFhZjk1ZTdjZTllYTczYTRiN2FlZjQyNDZjN2Q3YzAzZjhlM2EwMTJiZjliNSJ9"
         }
       ]
     },
     {
       "id": "claim_54ce93defa3a454f9a4a03bc2d6ef614",
-      "statement": "langchain (v1.4.2) depends on langchain-core and LangGraph, and provides the Agent Factory, agent middleware system, and init_chat_model for high-level orchestration.",
+      "statement": "langchain (v1.4.4) depends on langchain-core and LangGraph, and provides the Agent Factory, agent middleware system, and init_chat_model for high-level orchestration.",
       "evidence": [
         {
-          "resource": "repo://libs/langchain_v1/langchain/agents/factory.py#L1-L50",
-          "version": "repo-lines-v1:sha256:56c46149d0c4fa21da291c56322f52788f9eaad273db1eca1be1ab170a994947:eyJzZWxlY3RlZExpbmVDb3VudCI6NTcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRiODk5ZDMyOGM3OWUzYTI0NzBmNDgxMDRjMGNhMjgyYmMyYTU2ODZlMmU3ZDhmOTdmOGEzMzFmOTQ1MzAxOGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjMDExN2RlMmQ0N2YyNmMzOWIwNTkzNDEwNzYzYmI4NTBmNjMzMzUyOGQ2MGE3YWFmNDZmN2NmM2RkOWEzMTQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgyNGRlMmE2YTc3N2ZiNWRjOTk4MmUwNDBlYzY3M2VmNWEwOGVhZmRkMTEyM2JiNWQwMWZiODk4MTZmNzI0MzUifQ"
+          "resource": "repo://libs/langchain_v1/langchain/agents/factory.py#L1-L100",
+          "version": "repo-lines-v1:sha256:270bfc26c7bd44e92d3bed90cc9855e548d5a7e6d4fcbb302d8c00275a6ca461:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkYjg5OWQzMjhjNzllM2EyNDcwZjQ4MTA0YzBjYTI4MmJjMmE1Njg2ZTJlN2Q4Zjk3ZjhhMzMxZjk0NTMwMThiIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI1OTRiOGI2MDhkYzRhNWQwY2VmOWJlNjEwYTRiZDVjZDlhZmRjOTk2NzJmOTQxYmVjZTczNGZkNjkwYTQyNTYxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJkZjQ1NDJlZTBiMTk1NTI4YjAxODZiZDM2MjA2YTExNGJiNjNkZDU3MzY0NjE0N2RmM2Q0YTdmMDViMDJlNzg4In0"
         },
         {
-          "resource": "repo://libs/langchain_v1/langchain/chat_models/base.py#L1-L100",
-          "version": "repo-lines-v1:sha256:3ef2ee98c28f92d90330d719fbe0d479b211475a8f5bc284c551f7c907ddee0b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAyLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkYmQ1OGIwYTEwODJhNjFmZWU5NGY4MTMyNjYzNTZjOGU2YTllYTJjMjQzMDgyOGNhNjI5NTI2MWY3MWQwYzc0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiJkYWU4YmVlZGQ0ZDcxZDE5NTAzNjU5N2I0MTU2NDkxYWIwNzE2MjRkMzVhYmFiZWQwYmI3OWMyMmVmZDVlNGRmIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI2ZjdkOTE2NDM3NmM2ZDE4ZGQ2ZDEzYjdlNjE2ZTc3YzE3NjAwY2U0OGFlZTUwNDBiZWUyYzZkYjllMTJjNTc1In0"
+          "resource": "repo://libs/langchain_v1/langchain/chat_models/base.py#L1-L150",
+          "version": "repo-lines-v1:sha256:25bad5417866cf16f1e5a2550c791af34d74a862ccaf22a86b289ad5e14fa02a:eyJzZWxlY3RlZExpbmVDb3VudCI6MTUwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiJkYmQ1OGIwYTEwODJhNjFmZWU5NGY4MTMyNjYzNTZjOGU2YTllYTJjMjQzMDgyOGNhNjI5NTI2MWY3MWQwYzc0IiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MCwicHJlY2VkaW5nQ29udGV4dEhhc2giOiJlM2IwYzQ0Mjk4ZmMxYzE0OWFmYmY0Yzg5OTZmYjkyNDI3YWU0MWU0NjQ5YjkzNGNhNDk1OTkxYjc4NTJiODU1IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJmZTQ4MmQyMTI2ZWExODk1N2YwMmZjYThmMzExMDg0ZDJhOWIzODAyMjA2YWRmOTJmNGVhNGI5ZDQ4NGI5ZTBiIn0"
         },
         {
           "resource": "repo://libs/langchain_v1/pyproject.toml#L24-L30",
-          "version": "repo-lines-v1:sha256:d8e1c5f75040cfa3188a9a7e6abf8cfc24c193fd8c27702c948bcd5a1682c341:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNWMxNTQwYWEzYzEyYzlmNjMxNDQxNDZmNTU3ZTQyOTAyMGNkMDhhYWM0ZDQzZThhNzQ1MDI2NjBjZGNkZjlhYiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjk0MTZlMDlmNzhiYTMxNmMwMzI1NjgyMTNiODU1ZWU3NTZlNDE1NjVkOTE4ZjA5NTE5YzgxZmQ2MjBmNDA2MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmRmYWFiMzNiMmUzYTUwMTM3NmZlODIxNDNkNzBmNmVkYjMyNWI4YWMzYWI5MDUwYTg0OTgwN2ZmM2FhZGI3NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDQyZWY1NmY0YTJjOWRmNjRkZDllM2VmMDBjZmZhYjIxNzM3ZjA1MWFjNTZjNzNkMGM2YTA3NDk0NDI2OGVhZSJ9"
+          "version": "repo-lines-v1:sha256:cf9ce447bdf48c9e8e69c675d9c1c306fed2266e14824ffb8d2cbaf3b8151fa3:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjYwMGQxNWE4YjM3MTYxMmNhOThjZDEyYjhiZDkwMjhmYjRiZTA3YWFjMmU1YTg4YWVjYjM2NWQ5ZDQ0NjAyZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZjk0MTZlMDlmNzhiYTMxNmMwMzI1NjgyMTNiODU1ZWU3NTZlNDE1NjVkOTE4ZjA5NTE5YzgxZmQ2MjBmNDA2MCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmRmYWFiMzNiMmUzYTUwMTM3NmZlODIxNDNkNzBmNmVkYjMyNWI4YWMzYWI5MDUwYTg0OTgwN2ZmM2FhZGI3NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDQyZWY1NmY0YTJjOWRmNjRkZDllM2VmMDBjZmZhYjIxNzM3ZjA1MWFjNTZjNzNkMGM2YTA3NDk0NDI2OGVhZSJ9"
         }
       ]
     },
@@ -69,12 +69,12 @@
           "version": "repo-file-v1:sha256:104a04a55977ae78550d262f195ad3b51ddbbf9f321318e17c39376aa2c683bb"
         },
         {
-          "resource": "repo://libs/partners/openai/langchain_openai/__init__.py",
-          "version": "repo-file-v1:sha256:d08e06dea1f954a477fa8951e2a8387a10396d07b92a3a60fdced307c136a84f"
+          "resource": "repo://libs/partners/openai/langchain_openai/__init__.py#L1-L22",
+          "version": "repo-lines-v1:sha256:5673ccbe8f53267c2027dd390051424928a6e1e744c2f8c8a418960a29dccf4d:eyJzZWxlY3RlZExpbmVDb3VudCI6MjIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVkM2U5NWUyOTU2ZGIwZjBiZTEwYTU5MzJmNjM1NDJmNGY5YzExMGRiYmU5NjViYzAxNmI1NDAwZTZmNjQxNjgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5NDE2ZTA5Zjc4YmEzMTZjMDMyNTY4MjEzYjg1NWVlNzU2ZTQxNTY1ZDkxOGYwOTUxOWM4MWZkNjIwZjQwNjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
         },
         {
-          "resource": "repo://libs/partners/openai/langchain_openai/chat_models/base.py#L1-L50",
-          "version": "repo-lines-v1:sha256:b972f9928545904dc248d138c943fc37ce04364c9f3ed8a4461915e774ca44b6:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMwMWZkYTIxNjI4MGFjNjg0ZmI1ZGQ4NjIxYmE5NTJiMjU3YzhjZTVlMDExM2U2N2JjMTJkZDBlZGU1ZTg2MGMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyODFhMDEyZDkwNWU4YzQwNTdiNzJmNGY2NWQ5ODBjZWUyNTAxMmU2MTgzM2E2MDM1N2JiZjk2ODY5ODk1ZDYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE2NDcxNTMyNmUwZDYxNDlkYWE3YTYzZDFkMDE3MmVlMWM1Yjk1NzlkZTliOTQ0NDBjZGM4MjFiNzVhYmNjMWEifQ"
+          "resource": "repo://libs/partners/openai/langchain_openai/chat_models/base.py#L50-L100",
+          "version": "repo-lines-v1:sha256:eb2b04eec0c2b1ccaefc9ebe984ccb5a84374a0cf7033cba638b545cc0d71260:eyJzZWxlY3RlZExpbmVDb3VudCI6NTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyODFhMDEyZDkwNWU4YzQwNTdiNzJmNGY2NWQ5ODBjZWUyNTAxMmU2MTgzM2E2MDM1N2JiZjk2ODY5ODk1ZDYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImFjNmZiZjFhZmZiYzM1Mzg0OGNmOWEyOTk2NDJiMjk2ZGZmOWZmZDdhOTU3MzJiMjBhZTc0YTI1YzBjZWY5ZTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc5NTRjMTdkMzA2YjBmMWE4NDcxZTdmMzhhNDYxYzE3Mzk0MzAyYTYwOWQ5MTMyYWMyMjJhZGEyNjY4NjY5NDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImM3ZjNiMjIyYmRkYjdjNDg1M2RjMDI1ZGRkY2NhMDQzNzYyZjU2NmU2MDkyNjBkNjBhOGE1ZDViMWJmZGJlNDUifQ"
         }
       ]
     },
@@ -149,6 +149,6 @@
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-29T08:28:34.635Z"
+    "at": "2026-10-11T08:26:15.994Z"
   }
 }

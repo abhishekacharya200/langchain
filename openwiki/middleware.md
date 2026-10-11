@@ -2,27 +2,49 @@
 type: "Reference"
 title: "Agent Middleware: Composable Request/Response Processing"
 description: "Comprehensive guide to the middleware composition system: hook types, typing, payload transformations, and practical examples for hooking into model calls, tool calls, and agent lifecycle."
-tags: [agent-middleware, request-interception, composition, error-handling, human-in-the-loop, lifecycle-hooks]
+tags: [agent-middleware, request-interception, composition, error-handling, human-in-the-loop, lifecycle-hooks, rate-limiting, retry-logic]
 sources:
   - id: openwiki-source-71e882e1ac9757ea8e959a7c
     resource: repo://libs/langchain_v1/langchain/agents/factory.py
+  - id: openwiki-source-06696cc270b3776a2998ed33
+    resource: repo://libs/langchain_v1/langchain/agents/middleware/_execution.py
+  - id: openwiki-source-389cf92e5a9dec3f73e33d40
+    resource: repo://libs/langchain_v1/langchain/agents/middleware/_redaction.py
+  - id: openwiki-source-fade8b007148352ffbcde6e8
+    resource: repo://libs/langchain_v1/langchain/agents/middleware/_retry.py
+  - id: openwiki-source-597bcb7f05949abaf6f859e3
+    resource: repo://libs/langchain_v1/langchain/agents/middleware/context_editing.py
+  - id: openwiki-source-6bd5f219ac7bd5685ed8d337
+    resource: repo://libs/langchain_v1/langchain/agents/middleware/file_search.py
   - id: openwiki-source-bc95cc8fff4e07f74e50ce8b
     resource: repo://libs/langchain_v1/langchain/agents/middleware/human_in_the_loop.py
+  - id: openwiki-source-7078abd81eeb5367603eaa4d
+    resource: repo://libs/langchain_v1/langchain/agents/middleware/model_call_limit.py
+  - id: openwiki-source-ff20bfd119c5b0fb5dd72b6d
+    resource: repo://libs/langchain_v1/langchain/agents/middleware/model_fallback.py
   - id: openwiki-source-c29f7722b0a4bcc0d760335e
     resource: repo://libs/langchain_v1/langchain/agents/middleware/model_retry.py
+  - id: openwiki-source-f602b70412db913371269411
+    resource: repo://libs/langchain_v1/langchain/agents/middleware/pii.py
+  - id: openwiki-source-f1d3cb6b47edd942204a0d6b
+    resource: repo://libs/langchain_v1/langchain/agents/middleware/shell_tool.py
+  - id: openwiki-source-50108ce202a6d5d98d232aba
+    resource: repo://libs/langchain_v1/langchain/agents/middleware/tool_call_limit.py
   - id: openwiki-source-219798683681ccdced950f4d
     resource: repo://libs/langchain_v1/langchain/agents/middleware/tool_error.py
+  - id: openwiki-source-ca5686c3f30a4e08bba10929
+    resource: repo://libs/langchain_v1/langchain/agents/middleware/tool_retry.py
   - id: openwiki-source-03e8ca0eebe37feda8566793
     resource: repo://libs/langchain_v1/langchain/agents/middleware/types.py
-generated: { by: "openwiki/0.5.0", at: "2026-09-28T08:35:20.640Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-10-11T08:26:15.994Z" }
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-28T08:35:20.640Z
+    at: 2026-10-11T08:26:15.994Z
 ---
 
 ## Overview
 
-Middleware in LangChain agents provides a composable, layered approach to intercepting and modifying agent behavior without changing core agent logic. Middleware hooks into the agent execution loop to implement cross-cutting concerns: automatic retries, error handling, human-in-the-loop approval, tool argument validation, structured output transformation, and tool caching.
+Middleware in LangChain agents provides a composable, layered approach to intercepting and modifying agent behavior without changing core agent logic. Middleware hooks into the agent execution loop to implement cross-cutting concerns: automatic retries with exponential backoff, graceful error handling, human-in-the-loop approval workflows, tool argument validation, structured output transformation, request/response rate limiting, and tool call caching.
 
 ### Core Architectural Principles
 
@@ -179,13 +201,13 @@ retry = ModelRetryMiddleware(
 )
 ```
 
-**ModelFallbackMiddleware**: Wraps the primary model with a fallback model (typically smaller/faster/cheaper) when the primary fails or to diversify model selection strategies.
+**ModelFallbackMiddleware**: Wraps the primary model with a fallback model (typically smaller/faster/cheaper) when the primary fails. Sanitizes provider-specific cache settings (Anthropic, Fireworks) to ensure compatibility across fallback attempts. Useful for reliability and cost optimization.
 
-**ModelCallLimitMiddleware**: Enforces a maximum number of model calls per agent invocation, preventing runaway loops.
+**ModelCallLimitMiddleware**: Enforces a maximum number of model calls per agent invocation or per thread, preventing runaway loops. Supports thread-level (persistent) and run-level (per invocation) counting with configurable exit behavior (`'continue'`, `'error'`, or `'end'`).
 
 ### Tool Execution Middleware
 
-**ToolErrorMiddleware**: Converts tool execution exceptions (e.g., API errors, validation failures) into error `ToolMessage` objects sent back to the model, allowing the model to recover or clarify. Opt-in by exception type.
+**ToolErrorMiddleware**: Converts tool execution exceptions (e.g., API errors, validation failures) into error `ToolMessage` objects sent back to the model, allowing the model to recover or clarify. Opt-in by exception type; exceptions not explicitly handled propagate unchanged.
 
 ```python
 from langchain.agents.middleware import ToolErrorMiddleware
@@ -198,9 +220,9 @@ def on_error(exc: Exception, request: ToolCallRequest) -> str | None:
 middleware = ToolErrorMiddleware(on_error=on_error)
 ```
 
-**ToolRetryMiddleware**: Retries failed tool calls with configurable backoff and validation logic.
+**ToolRetryMiddleware**: Retries failed tool calls with configurable backoff and validation logic. Supports per-tool configuration and custom failure handlers. Commonly composed with ToolErrorMiddleware (ToolRetryMiddleware inner) to handle retryable errors gracefully.
 
-**ToolCallLimitMiddleware**: Prevents infinite tool loops by enforcing a maximum number of tool calls.
+**ToolCallLimitMiddleware**: Prevents infinite tool loops by enforcing a maximum number of tool calls per thread or per run. Supports selective limiting per tool and flexible exit behavior.
 
 ### Control Flow & Approval Middleware
 
@@ -228,17 +250,17 @@ The middleware constructs `ActionRequest` objects (with name, args, and optional
 
 ### Data Transformation & Privacy Middleware
 
-**PIIMiddleware**: Detects personally identifiable information (PII) in prompts, model responses, and tool outputs; optionally redacts or transforms it. Supports configurable detectors and redaction rules.
+**PIIMiddleware**: Detects personally identifiable information (PII) in prompts, model responses, and tool outputs; optionally redacts, masks, hashes, or blocks it. Supports configurable detectors and redaction rules with granular strategy control.
 
-**ContextEditingMiddleware**: Allows dynamic modification of agent context (system message, available tools) during execution.
+**ContextEditingMiddleware**: Allows dynamic modification of agent context (system message, available tools) during execution based on state or external events.
 
-**FileSearchMiddleware**: Integrates file search capabilities into the agent, retrieving relevant documents before model calls.
+**FileSearchMiddleware**: Integrates file search capabilities into the agent, retrieving relevant documents before model calls using glob and grep patterns.
 
 ### System Tools Middleware
 
-**ShellToolMiddleware**: Provides controlled shell command execution with configurable resource limits, sandboxing (host, Docker, Codex), timeout enforcement, and output truncation.
+**ShellToolMiddleware**: Provides controlled shell command execution with configurable resource limits, sandboxing (host, Docker, Codex), timeout enforcement, and output truncation. Critical for security in untrusted environments.
 
-**TodoListMiddleware**: Adds persistent todo list management capability.
+**TodoListMiddleware**: Adds persistent todo list management capability to track and manage agent-generated tasks.
 
 ## Request and Response Types
 
@@ -350,6 +372,115 @@ State updates from hooks are merged using LangGraph reducers. For the `messages`
 - **Non-reducer fields**: Later commands overwrite earlier ones (outermost middleware wins). This means if multiple middleware return commands with state updates to the same field (other than `messages`), the outermost middleware's value takes precedence.
 
 Example: If M1 and M3 both return commands with `{"status": "value"}`, M1's value (outermost) is used.
+
+## Rate Limiting and Throttling Patterns
+
+Middleware can implement rate limiting and throttling by tracking call counts and timing in the state. Key patterns include:
+
+**Thread-level vs. Run-level Limits**: Middleware can maintain both persistent (thread-scoped) and per-invocation (run-scoped) counters. Thread-level limits persist across multiple agent invocations in the same thread, useful for per-session quotas. Run-level limits reset on each agent invocation.
+
+**Exponential Backoff with Jitter**: Retry middleware implements exponential backoff (`delay = initial_delay * backoff_factor ^ attempt`) with optional random jitter to avoid thundering herd problems when multiple agents retry simultaneously.
+
+**Adaptive Throttling**: Middleware can observe response times and model load indicators to adjust rate limits dynamically, reducing throughput during high-latency periods.
+
+Example pattern using `before_model` hook to track and enforce rate limits:
+
+```python
+from langchain.agents.middleware import AgentMiddleware
+
+class RateLimitMiddleware(AgentMiddleware):
+    def __init__(self, calls_per_minute: int = 60):
+        self.calls_per_minute = calls_per_minute
+        self.call_times: list[float] = []
+    
+    def before_model(self, state, runtime):
+        import time
+        now = time.time()
+        # Prune old calls outside the 1-minute window
+        self.call_times = [t for t in self.call_times if now - t < 60]
+        
+        if len(self.call_times) >= self.calls_per_minute:
+            # Wait until oldest call falls out of window
+            sleep_time = 60 - (now - self.call_times[0])
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+        
+        self.call_times.append(now)
+        return None
+```
+
+## Error Handling Middleware: Fallbacks, Retries, and Recovery
+
+**Fallback Chains**: ModelFallbackMiddleware wraps a primary model with ordered fallbacks. If the primary fails (raises exception, times out, or returns an error), the middleware retries with the next fallback model in the chain. This provides graceful degradation: prefer GPT-4o but fall back to GPT-4, then GPT-3.5-turbo if needed.
+
+**Retry with Exponential Backoff**: ModelRetryMiddleware and ToolRetryMiddleware automatically retry on transient errors (rate limits, timeouts) with exponential backoff and optional jitter. Configuration allows custom exception filtering (which errors to retry) and on_failure behavior (continue with error message or re-raise).
+
+**Error Message Injection**: ToolErrorMiddleware converts exceptions into error ToolMessages sent back to the model. The model sees a friendly error message and can decide to retry, call a different tool, or clarify its request. This is more graceful than halting execution.
+
+**Recovery Strategies**: Middleware can implement recovery by:
+- Returning alternative responses (cached results, default values) when the primary execution fails
+- Modifying requests to be more lenient (removing optional tool arguments, simplifying queries)
+- Injecting recovery hints into state (suggestions for the model to try different approaches)
+
+## Logging and Monitoring Middleware for Observability
+
+**Trace Policy**: Middleware can configure `trace_policy` to control what is captured in LangSmith traces:
+
+```python
+from langchain.agents.middleware import TracePolicy, omit_payload
+
+class MyMiddleware(AgentMiddleware):
+    trace_policy = TracePolicy(process_inputs=omit_payload)
+    # Omit input payloads from traces to reduce noise, keep spans and timing
+```
+
+**Hook Naming**: Middleware hooks are automatically named in trace spans as `{middleware_name}.{hook_name}`, e.g., `ModelRetryMiddleware.wrap_model_call`, making it easy to identify which middleware handled each span in observability dashboards.
+
+**Logging Best Practices**:
+- Use `logger.debug()` for detailed execution flow (which middleware path was taken)
+- Use `logger.warning()` for recoverable issues (retries, fallbacks)
+- Use `logger.error()` for unrecoverable failures
+- Avoid logging request/response content directly; log summary statistics instead (message count, tokens) to reduce PII exposure
+
+Example logging middleware:
+
+```python
+import logging
+from langchain.agents.middleware import AgentMiddleware
+
+logger = logging.getLogger(__name__)
+
+class ObservabilityMiddleware(AgentMiddleware):
+    def before_model(self, state, runtime):
+        msg_count = len(state.get("messages", []))
+        logger.debug(f"Calling model with {msg_count} messages in context")
+        return None
+    
+    def wrap_model_call(self, request, handler):
+        import time
+        start = time.time()
+        try:
+            response = handler(request)
+            elapsed = time.time() - start
+            logger.info(f"Model call completed in {elapsed:.2f}s")
+            return response
+        except Exception as exc:
+            logger.error(f"Model call failed: {type(exc).__name__}", exc_info=True)
+            raise
+```
+
+## Agent Factory Middleware: Applying Transformations
+
+The agent factory (`create_agent()`) accepts a `middleware` list that is automatically integrated into the compiled graph. The factory:
+
+1. **Collects middleware hooks** from all middleware instances
+2. **Composes wrap_model_call handlers** via `_chain_model_call_handlers`, establishing first-is-outermost order
+3. **Composes wrap_tool_call handlers** through ToolNode integration
+4. **Merges state schemas** from middleware `state_schema` attributes into the base AgentState
+5. **Registers additional tools** from middleware `tools` attributes
+6. **Applies trace policies** to each middleware's hooks individually
+
+**Key Invariant**: First middleware in the list becomes the outermost layer. Commands from each layer are accumulated in inner-to-outer order and applied sequentially after model execution through LangGraph's reducer-based state system.
 
 ## Writing Custom Middleware
 
@@ -493,24 +624,6 @@ agent = create_agent(
 
 **Composition Rule**: First in the list = outermost (highest priority for interception and response transformation). The factory collects middleware with wrap_model_call and awrap_model_call hooks, composes them into a single middleware stack via internal composition functions, establishing an order where the first middleware becomes the outermost layer. Commands from each layer are accumulated in inner-to-outer order and applied sequentially after model execution through LangGraph's reducer-based state system.
 
-## Tracing and Observability
-
-### Trace Policy
-
-Middleware can configure what gets traced via `trace_policy`:
-
-```python
-from langchain.agents.middleware import TracePolicy, omit_payload
-
-class MyMiddleware(AgentMiddleware):
-    trace_policy = TracePolicy(process_inputs=omit_payload)
-    # Omit input payloads from traces to reduce noise, keep spans and timing
-```
-
-### Hook Naming in Traces
-
-Middleware hooks are automatically named in trace spans as `{middleware_name}.{hook_name}`, e.g., `ModelRetryMiddleware.wrap_model_call`, making it easy to identify which middleware handled each span.
-
 ## Common Patterns and Anti-Patterns
 
 ### ✅ Good Patterns
@@ -521,6 +634,8 @@ Middleware hooks are automatically named in trace spans as `{middleware_name}.{h
 4. **Clear Composition Order**: Document which middleware should run first, especially when order matters (e.g., retry before error handling).
 5. **Fallback Behavior**: Implement sync and async versions to support both execution paths.
 6. **Command Ordering**: When returning Commands, consider that multiple middleware commands stack—outermost middleware's non-reducer fields win.
+7. **Logging with Context**: Log what middleware did, not secrets; include attempt counts and timing information.
+8. **Rate Limiting Awareness**: When chaining retry and rate-limit middleware, place rate-limit outer to prevent retry storms.
 
 ### ❌ Anti-Patterns
 
@@ -530,6 +645,8 @@ Middleware hooks are automatically named in trace spans as `{middleware_name}.{h
 4. **Blocking Async**: Never use `asyncio.run()` or sync I/O in async middleware implementations.
 5. **Over-Composition**: Don't add more middleware than necessary; each layer adds latency.
 6. **Ignoring Command Semantics**: Don't assume Command fields will accumulate like messages; remember that non-reducer fields follow outermost-wins semantics.
+7. **Logging PII**: Never log request content, model responses, or tool arguments directly—extract summaries only.
+8. **Retry Without Backoff**: Never retry immediately without delay; use exponential backoff to avoid overwhelming APIs.
 
 ## Key Invariants and Lifecycle
 
@@ -539,9 +656,12 @@ Middleware hooks are automatically named in trace spans as `{middleware_name}.{h
 - **Command Flow**: `ExtendedModelResponse` commands are collected (inner-to-outer) and applied after the model node completes through LangGraph reducers.
 - **Sync/Async Consistency**: Choosing execution path (sync or async) is determined at agent invocation time; middleware cannot switch contexts mid-execution.
 - **Exception Propagation**: Exceptions that are not explicitly handled propagate to the caller, unless a middleware converts them to a message or command.
+- **Control-Flow Signals**: LangGraph interrupts and parent commands always propagate through middleware without being caught by error handlers.
 
 ## See Also
 
 - [Agent Execution Flow and Loop Control](/openwiki/agent-execution.md) – Detailed description of the agent loop, state management, and where middleware hooks are invoked.
 - [Agent Factory and Graph Construction](/openwiki/agent-factory.md) – How the agent graph is built, including middleware integration and handler composition.
 - [Tools](/openwiki/tools.md) – Tool definition, registration, and execution context.
+- [Runnables](/openwiki/runnables.md) – Composable execution model that underlies middleware composition.
+- [Chat Models](/openwiki/chat-models.md) – BaseChatModel protocol that middleware intercepts.

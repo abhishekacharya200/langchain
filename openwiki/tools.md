@@ -3,12 +3,11 @@ type: "Reference"
 title: "Tools and Tool Binding"
 description: "LangChain's tool system enables agents and language models to execute structured actions through schema-aware components with automatic validation, error handling, and callback integration."
 tags: ["tool", "agent", "schema", "runnable", "execution"]
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-09-28T08:35:20.640Z
 sources:
   - id: openwiki-source-9861ba5cf0c42c142cf732f9
     resource: repo://libs/core/langchain_core/messages/tool.py
+  - id: openwiki-source-d89c127dbba78772dc5369ed
+    resource: repo://libs/core/langchain_core/output_parsers/openai_tools.py
   - id: openwiki-source-4ff475d7b00540f962384251
     resource: repo://libs/core/langchain_core/tools/base.py
   - id: openwiki-source-9c422fcb5ac12738f17d1cd1
@@ -19,7 +18,10 @@ sources:
     resource: repo://libs/core/langchain_core/tools/simple.py
   - id: openwiki-source-b816e651a5890bde13cf8013
     resource: repo://libs/core/langchain_core/tools/structured.py
-generated: { by: "openwiki/0.5.0", at: "2026-09-21T08:30:16.745Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-10-11T08:26:15.994Z" }
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-10-11T08:26:15.994Z
 ---
 
 ## Overview
@@ -499,6 +501,113 @@ Invalid docstrings (missing Args section, args not in signature, malformed) rais
 
 Set `verbose=True` to log tool execution. Combined with callback managers for comprehensive observability.
 
+## Tool Call Extraction and Output Parsers
+
+When language models call tools via tool_use or function_calling capabilities, the model's response must be parsed to extract structured tool calls. LangChain provides output parsers specialized for this task.
+
+**JsonOutputToolsParser:**
+
+Extracts tool calls from OpenAI-style responses:
+
+```python
+from langchain_core.output_parsers.openai_tools import JsonOutputToolsParser
+from langchain_openai import ChatOpenAI
+
+parser = JsonOutputToolsParser()
+
+# Parser converts model's tool_calls into a list of dicts:
+# [{"type": "tool_name", "args": {...}}, ...]
+```
+
+- Handles both complete and partial/streaming JSON
+- Supports `return_id=True` to preserve tool_call_id for response matching
+- Falls back to graceful error handling for malformed JSON
+- Filters tool calls by name via `JsonOutputKeyToolsParser` (extract specific tool results)
+
+**PydanticToolsParser:**
+
+Extends JsonOutputToolsParser to validate tool arguments against Pydantic models:
+
+```python
+from langchain_core.output_parsers.openai_tools import PydanticToolsParser
+from pydantic import BaseModel
+
+class SearchInput(BaseModel):
+    query: str
+    limit: int = 10
+
+parser = PydanticToolsParser(tools=[SearchInput])
+
+# Parser returns instantiated Pydantic objects:
+# [SearchInput(query="...", limit=10), ...]
+```
+
+- Maps tool call names to Pydantic model classes
+- Validates arguments against model schema, raising ValidationError on mismatch
+- Supports streaming with partial validation (skips incomplete objects)
+- Returns first tool only via `first_tool_only=True`
+
+**Streaming Tool Calls:**
+
+Tool calls can stream incrementally via `AIMessageChunk` when models support streaming:
+
+```python
+from langchain_core.messages import AIMessage, ToolCallChunk
+
+# During streaming, each chunk may contain partial tool call data:
+# ToolCallChunk(id="call_123", name="search", args='{"qu')
+# ToolCallChunk(id="call_123", name="search", args='{"query": "python"}')
+
+# Output parsers handle merging chunks into complete ToolCall objects
+```
+
+Multiple tool calls can be streamed in parallel, with each ToolCallChunk carrying an index identifying which call it belongs to. Parsers merge chunks via standard Runnable streaming semantics.
+
+## Tool Binding to Language Models
+
+Tools are integrated into language models via the `bind_tools()` method, converting tool definitions into provider-specific formats.
+
+**Binding Tools to a Model:**
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain_core.tools import tool
+
+@tool
+def search(query: str) -> str:
+    """Search for information."""
+    return f"Results for {query}"
+
+model = ChatOpenAI(model="gpt-4")
+model_with_tools = model.bind_tools([search])
+
+# Invoke the model; it receives tool definitions and may call tools
+response = model_with_tools.invoke("What is Python?")
+```
+
+**Provider-Specific Formats:**
+
+Models convert tool schemas to provider formats:
+- **OpenAI:** `function_calling` format with `functions` array and `function_call` response mode
+- **Anthropic:** `tool_use` format with `tools` array and Claude tool_use blocks
+- **Google:** `function_calling` with structured format
+
+Each provider receives tool_call_schema (subset model excluding injected arguments and reserved names) converted via `function_calling.py` utilities that map Pydantic schemas to FunctionDescription dicts with JSON schema parameters.
+
+**Tool Extras for Providers:**
+
+Provider-specific options are passed via the `extras` dict:
+
+```python
+@tool(extras={"cache_control": {"type": "ephemeral"}})
+def cached_search(query: str) -> str:
+    return query
+
+# Anthropic's cache_control applies to this tool's usage
+```
+
+Models inspect extras during tool binding and apply provider-specific behavior (e.g., prompt caching, deferred loading) when rendering tools.
+
 ## Summary: When to Use Each Pattern
 
 - **@tool decorator:** Primary pattern for converting functions to tools; use with type hints for automatic schema inference
@@ -508,3 +617,5 @@ Set `verbose=True` to log tool execution. Combined with callback managers for co
 - **convert_runnable_to_tool():** Wrapping existing Runnables as tools with consistent invocation
 - **Injected arguments:** Share runtime context (state, store, call IDs) without model visibility
 - **Custom error handlers:** Transform Pydantic or tool errors into user-friendly messages for agents
+- **Output parsers:** Extract and validate tool calls from model responses (JsonOutputToolsParser, PydanticToolsParser)
+- **bind_tools():** Integrate tools into language models with provider-specific format conversion

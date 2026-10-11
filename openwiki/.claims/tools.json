@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:6d374dc19fc3e275ddb3c6c5f639ddf83e7304cc9f64e70f5096f9a137f28e6e",
+  "pageVersion": "sha256:3ae2d4cbc7f202efe11aa7f006e92be0530ce2646d4d5b504dc6049d739aaffe",
   "claims": [
     {
       "id": "claim_72f3312a1c4a494889542dc6efdbf940",
@@ -64,11 +64,11 @@
       "evidence": [
         {
           "resource": "repo://libs/core/langchain_core/tools/base.py#L1009-L1135",
-          "version": "repo-lines-v1:sha256:059b4e3df79409c57dad310dd370fef936b4aa587fb63db8ad5cb88235049b94:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwMDhjZDk3OTY5Yjk0ZjdjYWJkOWFiODUyY2RlY2RjOWNlOTllNTJkNzJlYzFjZDE4YjhhZWNhMjlhOWUyYmUyIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4MjBlN2JiNmFkMzZjNjE5YWIxZjJiM2MyYjQzNTVjNjFlNWI1NTc3MmM4MmU2NGU1YmVkZmZkZDQ5YzQzNzMxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0ZDg5MjM5YTEwYTAwMTRmMjM0ZTE3MjM3NWQxMWZkZWFmNjdjNWFhNzJjZjFkYTMzMjMxMWQ3NGJiNjEwMTBhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJjMTIxMzUwY2E0NmI3Yjc0OWVkZTdlYTBhNmFhYmQ1ZGFjYWNmYmJkMTdmOGRkZTZjMjZmMmRkN2UyN2IxYjkxIn0"
+          "version": "repo-lines-v1:sha256:899a9cd38841879080e0d62013f442bfbe7473c0ed4f2843d83e1e6d19116df1:eyJzZWxlY3RlZExpbmVDb3VudCI6MTI3LCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiIwMDhjZDk3OTY5Yjk0ZjdjYWJkOWFiODUyY2RlY2RjOWNlOTllNTJkNzJlYzFjZDE4YjhhZWNhMjlhOWUyYmUyIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4MjBlN2JiNmFkMzZjNjE5YWIxZjJiM2MyYjQzNTVjNjFlNWI1NTc3MmM4MmU2NGU1YmVkZmZkZDQ5YzQzNzMxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0ZDg5MjM5YTEwYTAwMTRmMjM0ZTE3MjM3NWQxMWZkZWFmNjdjNWFhNzJjZjFkYTMzMjMxMWQ3NGJiNjEwMTBhIiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJjMTIxMzUwY2E0NmI3Yjc0OWVkZTdlYTBhNmFhYmQ1ZGFjYWNmYmJkMTdmOGRkZTZjMjZmMmRkN2UyN2IxYjkxIn0"
         },
         {
-          "resource": "repo://libs/core/langchain_core/tools/base.py#L1137-L1267",
-          "version": "repo-lines-v1:sha256:854816111f0fb475b9f84e2bc52f8f88e9c26c40b84501fd02508b5f90ce9290:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMxLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5ODg4Y2RmM2VjMDJlMzlhNjkwZWFiZTY2MzYzMjE2Yzc5MWZiYWU4Yzc5NjllM2VjYmY3ZGVmN2YyY2Y2NzYzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiIwMWJhNDcxOWM4MGI2ZmU5MTFiMDkxYTdjMDUxMjRiNjRlZWVjZTk2NGUwOWMwNThlZjhmOTgwNWRhY2E1NDZiIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0ZWVmNTIxMTkxYWNjMzY2NDcyMzI3MDk0NjZiOGY0ZDhhYjk3YTgwZjI5NDE2Y2UxYjY5MmYxNTQ0OGRiZmY3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiI1OTczOTkzMWU5NWZjNTZmNDE2MWE3YjI4ZjYxZTQ1ODE4MGQ1OWNjNWNjNWIwYzcyNDczOTdiMWRkYzM4MDczIn0"
+          "resource": "repo://libs/core/langchain_core/tools/base.py#L1137-L1266",
+          "version": "repo-lines-v1:sha256:a198dc2b247d6c0afe5840c0a3f64ef4029a4a9de7361b4e46f4051991fa704b:eyJzZWxlY3RlZExpbmVDb3VudCI6MTMwLCJmaXJzdFNlbGVjdGVkTGluZUhhc2giOiI5ODg4Y2RmM2VjMDJlMzlhNjkwZWFiZTY2MzYzMjE2Yzc5MWZiYWU4Yzc5NjllM2VjYmY3ZGVmN2YyY2Y2NzYzIiwibGFzdFNlbGVjdGVkTGluZUhhc2giOiI4MjBlN2JiNmFkMzZjNjE5YWIxZjJiM2MyYjQzNTVjNjFlNWI1NTc3MmM4MmU2NGU1YmVkZmZkZDQ5YzQzNzMxIiwicHJlY2VkaW5nQ29udGV4dExpbmVDb3VudCI6MywicHJlY2VkaW5nQ29udGV4dEhhc2giOiI0ZWVmNTIxMTkxYWNjMzY2NDcyMzI3MDk0NjZiOGY0ZDhhYjk3YTgwZjI5NDE2Y2UxYjY5MmYxNTQ0OGRiZmY3IiwiZm9sbG93aW5nQ29udGV4dExpbmVDb3VudCI6MywiZm9sbG93aW5nQ29udGV4dEhhc2giOiJlNDdjYTUwMDM4YTA3NGI5NDMwOGI5OTdkMWMzOWEyZDE5MWJjNWNkZTViMjYzYzcxMjE0OTRkYWU4NjM1YjExIn0"
         },
         {
           "resource": "repo://libs/core/langchain_core/tools/base.py#L778-L906",
@@ -86,7 +86,7 @@
         },
         {
           "resource": "repo://libs/core/langchain_core/tools/structured.py#L93-L186",
-          "version": "repo-lines-v1:sha256:e6e8e5ab99b794875b0596a1326b0f368375525e5ec9b29633f590cb20ea1744:eyJzZWxlY3RlZExpbmVDb3VudCI6OTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwNGEyZmU0N2EzYTE0MzZkZGMwMWQ0ZTE3YWU4ZjhhZjBjYjNjYTY2ZTQ1NmU4N2VkODQ1ZjU4YjYwYTA2ZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU0YzE2NjhlYzljZjAyZjcxYjY5YjUyMzg5YTUzYjNiZjU2ZDNiOWJlYmUxNWNlM2UxMGJiZDczNWY1ZWFjNjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZiYzU3OWMxM2QzZTY4YzQ0ODUyOGZlYWMyYWUyNjE0OTI0OWQ0NDdkY2I3Y2VmMjU4ZmU4Mjk2YzgxOTUxMjUifQ"
+          "version": "repo-lines-v1:sha256:74c39bf0ebcb6d8ee7bd414a795d17701b688ed82da6e05bb81fe110e1cf077e:eyJzZWxlY3RlZExpbmVDb3VudCI6OTQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYwNGEyZmU0N2EzYTE0MzZkZGMwMWQ0ZTE3YWU4ZjhhZjBjYjNjYTY2ZTQ1NmU4N2VkODQ1ZjU4YjYwYTA2ZjQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImU0YzE2NjhlYzljZjAyZjcxYjY5YjUyMzg5YTUzYjNiZjU2ZDNiOWJlYmUxNWNlM2UxMGJiZDczNWY1ZWFjNjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjZiYzU3OWMxM2QzZTY4YzQ0ODUyOGZlYWMyYWUyNjE0OTI0OWQ0NDdkY2I3Y2VmMjU4ZmU4Mjk2YzgxOTUxMjUifQ"
         }
       ]
     },
@@ -166,7 +166,7 @@
       "evidence": [
         {
           "resource": "repo://libs/core/langchain_core/tools/base.py#L1617-L1677",
-          "version": "repo-lines-v1:sha256:dcab87fe71f4a411f9d524cd735c89ab16217f98395dcb732ebf6f12833dda41:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyMTY5NWVjZjVjN2UzY2NjYjcwOTExMzA4ZmUzMjlmNzAyMjBmMDVlMGUxZTA1Zjk4OWU2OGQ0MmY4MWM0ODgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliOGNiZjRkNWU4MGJiZTVlNDhjNTdmNGZjYjczNTY3M2Q2MDc3NDBiNDJhN2FiNmM5MjM2ZTM3MmE5ZjUzZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhNTQ5YzAyZmNlMGQ0OGZiYTdmOWJiOWUwNjBkZWVhM2M2NDk4MjkwYzA3YTc5MjM4ZDZiMDVlNGVjN2RkNjMifQ"
+          "version": "repo-lines-v1:sha256:192b0cf8f49caef33e5e3645b94fc4d43fa67cd90853987b07bc90f3991e70c1:eyJzZWxlY3RlZExpbmVDb3VudCI6NjEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyMTY5NWVjZjVjN2UzY2NjYjcwOTExMzA4ZmUzMjlmNzAyMjBmMDVlMGUxZTA1Zjk4OWU2OGQ0MmY4MWM0ODgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjliOGNiZjRkNWU4MGJiZTVlNDhjNTdmNGZjYjczNTY3M2Q2MDc3NDBiNDJhN2FiNmM5MjM2ZTM3MmE5ZjUzZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjFhNTQ5YzAyZmNlMGQ0OGZiYTdmOWJiOWUwNjBkZWVhM2M2NDk4MjkwYzA3YTc5MjM4ZDZiMDVlNGVjN2RkNjMifQ"
         },
         {
           "resource": "repo://libs/core/langchain_core/tools/base.py#L889-L906",
@@ -211,10 +211,48 @@
           "version": "repo-lines-v1:sha256:436274b5dcf2c57abdf86c1e0fc3c0061283c60a27a1158bd1466176b72f82d3:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM1MzViY2E3YjMzZGRhMzdiNzljZDFlNGYyNTVkYmY2YmFhMDdjZWVlMGZiYTU1ODMyZTkyYmQ5ODkxODlhY2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk1ODg0MGQ5YWJjYmIyMjYwZDE3ZWFiNmFkOWQ3ZDlhNzcwNDc3OWZhNGVhZjA1YjlkYTMwNTFmZjNhYzNhMWEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImJlODBhOTE5MDFiMzg5ZWIyZDA4ZmFlNmRlYzM2Y2JlZDYzNGEwMDUyYTU1NTNlNDZkNmE4YjYwMTgzNDhjMjkifQ"
         }
       ]
+    },
+    {
+      "id": "claim_d1467d72660542cab897bf4fe9b11480",
+      "statement": "JsonOutputToolsParser and PydanticToolsParser extract tool calls from language model responses: JsonOutputToolsParser converts JSON-formatted tool calls (with optional tool_call_id) into dicts, while PydanticToolsParser validates tool arguments against provided Pydantic models and returns instantiated objects; both support partial/streaming JSON and filtering by tool name.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/output_parsers/openai_tools.py#L139-L210",
+          "version": "repo-lines-v1:sha256:0d8bc13ba9bb920c39eb534685670ee049f7a1755b2b75ba8cda341a0bf3b6de:eyJzZWxlY3RlZExpbmVDb3VudCI6NzIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhNGVhZDIxYTYyZDVkODBiYjg2Yjk5ZGE2OTQ2N2E4YTRlYjFmMTJiZDJlZGQwMmYzODU4NzBiNmVmMDNhOTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImMyODgxNjVjOTIwZGNkZGM5YTQyYmE2OWVkMDE0ZTM2NTg4MzQwYWM4MzZlMGE1MWMzYTA4NmNjYzYyYTc4MWEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjdlMGU1YmIyODcyYzhmMGE2ZjQyYWJjNTM5ZjY1N2M5NWY2MzFkMmUwZjAyYjI5YjBkNWM3MThkZmZiYjhhYzMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI0NjkzMTg2ZGU4OTMwNDg2OWNlM2E4NzMwZmIxMjliODZkYmRkYzhmN2E2YzM2OWEwNTA3YzFiNGZlOGZjNzEifQ"
+        },
+        {
+          "resource": "repo://libs/core/langchain_core/output_parsers/openai_tools.py#L305-L383",
+          "version": "repo-lines-v1:sha256:9d5ffff2e70d0c9191dfd108da2e4d2836f0b713a5b546443603577a68f7b80b:eyJzZWxlY3RlZExpbmVDb3VudCI6NzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImJjYjJmYzY1NDFmMDQ0MmQ1MjIwN2I2Y2ZjYzc5OTM3ODk2NGU4MGMyNmM2N2Q0MzA4MzNlOGNiMjk2ZThmYWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZhNDdhZmM3MjAzNDI2YWE3YjY2MGIyNjQ4YThhZWM4NDgyNGZiYzg3M2Y2NTZmN2VhNmQyYTU5YmM1ODBiYTgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5OGIwNjNkOWI0N2U2NTM3OTYyNTU3MmNjZTE5NzY2OWQ1NzY3ZTEyYzE4YmUwNzU2NTJiOGNkOTgxY2U4ZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_e9eb8292c2e44087ae7bbc705848d4c1",
+      "statement": "Tool calls can stream incrementally via AIMessageChunk with ToolCallChunk objects carrying partial argument JSON, id, and name; multiple concurrent tool calls are identified via index; output parsers merge chunks into complete ToolCall objects following standard Runnable streaming semantics.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/messages/tool.py#L206-L240",
+          "version": "repo-lines-v1:sha256:f0854aef615a3c71a93da78f9098284d6389c51f6ac1ab01b81ecb05e73dede4:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUxYTA2ZGY5ZTEwNDAwNTgzNDAxZDExNGFiNzE0MTEyYWY0MzhjYjJhMzg4YTQ2MmQ3YTA4Y2VhNWJmZTA4Y2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjgwMDQzNjdjZWJlMDRkMzQxNDNmZGM1OGY0OGU1NWQ3MWM3N2ZiZTU1OWRjNjJiZTE0N2FjODA1MzY5NmRkMGEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA5NjgyYjYwNDhhY2ExYjdiNjgyNzc5ZjI3Njc1ZmFmYjNkNzBlYjhkYzkyOTgxNDdiNmZhOWM2MWM3NmFiMWUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a35c890e61064ea2aa501ecc1faec5a6",
+      "statement": "Tools are integrated into language models via bind_tools() method, which converts tool_call_schema (excluding injected arguments and reserved names) to provider-specific formats: OpenAI uses function_calling with functions array, Anthropic uses tool_use with Claude tool blocks, Google uses structured function_calling; provider extras (e.g., cache_control) are inspected by models during rendering.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/tools/convert.py#L282-L347",
+          "version": "repo-lines-v1:sha256:be9637728742a7c0d5d7f274d54c4868e644ad3831d95a911a32feb26ddb3487:eyJzZWxlY3RlZExpbmVDb3VudCI6NjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhkZWM4Njc5YTU4ZjgzMzJjYWVlY2VhOGUzOTUyNzA0Yjg5MmQ2MGM5NmFkNDc1NTY3YjcxMTg4NWY0MWNjNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1MDMyZTk2NGQwOTMyMzUxZTVkMTg1MjY5MjgxYjE3MWEzYTA5YjA4YjI4NmU2NjFlYTQ3MDMyM2M4MmViNGQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjNkZjI2N2I4YjdhMGY3ODIwODg5MDk4YWU3ZGQ3NjI0ODI4YTE3MTVlZTU4NDNiOWRkNjQ0NzBlNzQ5ZWI5ZjEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjJjMGQ4ZDA4ZjNiMTk1ZGMyMDFmM2FhNmM2NGZlZDQ5MGYzYTM0OWQzNmZiNjA0NGI4YjI4YmQzYWIxMDE1MTIifQ"
+        },
+        {
+          "resource": "repo://libs/core/langchain_core/tools/render.py#L13-L67",
+          "version": "repo-lines-v1:sha256:c7e5748f94e34c198e082043ab39f9b44529842aafa9ee598a5139ad704c0041:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNjZGI3NGUxYTA1ZTMxZmUzZGJlNjRlNWQ2Njk0YThkYjQzOGI5NGE5ZDJmMDEwYmU1YjMzYmYwNzZkZDI3NTkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAzYjA1MDcwMjllZmNkZWJiZDE5ZTUxYWExZDRlMjIzNTBiNDk1NDE1ZWY4NGViMzllNmZiMzk2MTUzZDRiM2UiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ5MzM4ZDQ2NGQ5OWYxN2YzNGM1YWZkZjQ3Nzg0NDkwMWI2ODdiZjY1Nzc2NzE1ODlkMWIxZjNiODRhYzdiZDciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-28T08:35:20.640Z"
+    "at": "2026-10-11T08:26:15.994Z"
   }
 }

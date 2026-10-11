@@ -12,12 +12,16 @@ sources:
     resource: repo://libs/core/langchain_core/runnables/config.py
   - id: openwiki-source-f9f4c1dc4f9cdf80d824ce15
     resource: repo://libs/core/langchain_core/runnables/fallbacks.py
+  - id: openwiki-source-9dfc3b81e5c4eddaf65ffa3d
+    resource: repo://libs/core/langchain_core/runnables/history.py
   - id: openwiki-source-ebe3f825462d0b4a14ee3717
     resource: repo://libs/core/langchain_core/runnables/retry.py
-generated: { by: "openwiki/0.5.0", at: "2026-09-03T15:18:34.589Z" }
+  - id: openwiki-source-ab8564609b8da841f86ec352
+    resource: repo://libs/core/langchain_core/runnables/schema.py
+generated: { by: "openwiki/0.5.0", at: "2026-10-11T08:26:15.994Z" }
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-28T08:35:20.640Z
+    at: 2026-10-11T08:26:15.994Z
 ---
 
 ## Overview
@@ -628,6 +632,207 @@ Callbacks receive hooks for:
 - And many others
 
 This enables real-time monitoring, custom logging, user attribution, and performance tracking.
+
+## Streaming Events
+
+**Location**: `repo://libs/core/langchain_core/runnables/base.py#L1369-L1585` and `repo://libs/core/langchain_core/runnables/schema.py#L56-L188`
+
+**`astream_events(input, config=None, version='v2', ...)`** generates a stream of `StreamEvent` objects that provide real-time information about chain execution:
+
+```python
+from langchain_core.runnables import RunnableLambda
+
+async def reverse(s: str) -> str:
+    return s[::-1]
+
+chain = RunnableLambda(func=reverse)
+
+# Stream execution events
+async for event in chain.astream_events("hello", version="v2"):
+    print(event)
+    # Yields: on_chain_start, on_chain_stream, on_chain_end events
+```
+
+### StreamEvent Schema
+
+A `StreamEvent` is a dictionary with:
+
+- **`event`**: Format `on_[type]_(start|stream|end)`. Types include:
+  - `chat_model`: Chat language models (e.g., GPT)
+  - `llm`: Non-chat language models
+  - `prompt`: Prompt templates
+  - `tool`: Tool/function calls
+  - `chain`: Generic runnables
+  - `retriever`: Document retrievers
+
+- **`name`**: The name of the Runnable that generated the event.
+
+- **`run_id`**: Unique ID for this execution (per Runnable in the chain).
+
+- **`parent_ids`**: List of parent Runnable IDs (root has empty list). Available in v2+.
+
+- **`tags`**: Tags inherited from parent Runnables.
+
+- **`metadata`**: Metadata associated with the Runnable.
+
+- **`data`**: Event data (type-dependent):
+  - **`start` events**: `{"input": ...}`
+  - **`stream` events**: `{"chunk": ...}` (partial output)
+  - **`end` events**: `{"output": ...}` (complete output)
+
+### Event Filtering
+
+Events can be filtered by Runnable characteristics:
+
+```python
+async for event in chain.astream_events(
+    input,
+    version="v2",
+    include_types=["chat_model"],  # Only chat model events
+    exclude_names=["internal_step"],  # Skip certain Runnables
+    include_tags=["production"],  # Only tagged with 'production'
+):
+    print(event)
+```
+
+### Custom Events
+
+Custom events can be dispatched from within a Runnable:
+
+```python
+from langchain_core.callbacks.manager import adispatch_custom_event
+from langchain_core.runnables import RunnableLambda, RunnableConfig
+
+async def slow_thing(some_input: str, config: RunnableConfig) -> str:
+    await adispatch_custom_event(
+        "progress_event",
+        {"message": "Processing..."},
+        config=config,
+    )
+    return "Done"
+
+chain = RunnableLambda(slow_thing)
+
+async for event in chain.astream_events("input", version="v2"):
+    if event["event"] == "on_custom_event":
+        print(f"Progress: {event['data']['message']}")
+```
+
+### API Versions
+
+- **`v2` (default)**: Yields `StreamEvent` dicts with standard and custom events. Supports filtering.
+- **`v1`**: Legacy format for backwards compatibility (deprecated in 0.4.0).
+- **`v3`**: Typed, content-block-centric streaming protocol (beta, only on `BaseChatModel` and `langgraph.CompiledGraph`).
+
+## Message History Management
+
+**Location**: `repo://libs/core/langchain_core/runnables/history.py#L40-L224`
+
+**`RunnableWithMessageHistory`** wraps a Runnable to manage chat message history across conversation turns. It automatically loads historical messages before execution and saves new messages after completion.
+
+```python
+from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_openai import ChatOpenAI
+
+# Define a session history store (e.g., in-memory for testing)
+store = {}
+
+def get_session_history(session_id: str) -> BaseChatMessageHistory:
+    if session_id not in store:
+        store[session_id] = InMemoryHistory()  # Custom history implementation
+    return store[session_id]
+
+# Build the chain with history support
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a helpful assistant."),
+    MessagesPlaceholder(variable_name="history"),
+    ("human", "{input}"),
+])
+chain = prompt | ChatOpenAI()
+
+# Wrap with message history
+with_history = RunnableWithMessageHistory(
+    chain,
+    get_session_history,
+    input_messages_key="input",
+    history_messages_key="history",
+)
+
+# Invoke with session ID
+result = with_history.invoke(
+    {"input": "What's the capital of France?"},
+    config={"configurable": {"session_id": "user_123"}}
+)
+# Automatically loads history and saves the new exchange
+```
+
+### Input Formats
+
+The wrapped Runnable can accept messages in three formats:
+
+1. **List of messages**: `Runnable[[BaseMessage], ...] `
+2. **Single dict with all messages**: `Runnable[{"messages": [...]}, ...]`
+3. **Dict with separate input and history keys**: `Runnable[{"input": "...", "history": [...]}, ...]`
+
+Use `input_messages_key` and `history_messages_key` to specify which format.
+
+### Output Formats
+
+The wrapped Runnable can return:
+
+1. **String**: Automatically wrapped as `AIMessage`
+2. **BaseMessage**: Returned as-is
+3. **Dict with message key**: Use `output_messages_key` to specify the key
+
+### Configuration Fields
+
+History factory configuration is customizable via `history_factory_config`:
+
+```python
+from langchain_core.runnables.utils import ConfigurableFieldSpec
+
+with_history = RunnableWithMessageHistory(
+    chain,
+    get_session_history,
+    input_messages_key="input",
+    history_messages_key="history",
+    history_factory_config=[
+        ConfigurableFieldSpec(
+            id="user_id",
+            annotation=str,
+            name="User ID",
+            description="Unique user identifier",
+            default="",
+            is_shared=True,
+        ),
+        ConfigurableFieldSpec(
+            id="thread_id",
+            annotation=str,
+            name="Thread ID",
+            description="Conversation thread identifier",
+            default="",
+            is_shared=True,
+        ),
+    ],
+)
+
+# The history factory now receives both parameters
+with_history.invoke(
+    {"input": "Hello"},
+    config={
+        "configurable": {
+            "user_id": "alice",
+            "thread_id": "conv_1"
+        }
+    }
+)
+```
+
+### Persistence
+
+`RunnableWithMessageHistory` is deprecated in favor of LangGraph's built-in persistence for new projects, but remains supported. For production use, implement persistent history backends (e.g., Redis, PostgreSQL) by overriding `BaseChatMessageHistory.add_messages()` and `clear()`.
 
 ## All Components Are Runnables
 

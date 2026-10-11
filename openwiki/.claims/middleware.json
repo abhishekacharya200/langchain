@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:292ef3af03c17963611499165f6045b27db7700b522fb3d608fb027272c23f40",
+  "pageVersion": "sha256:f962dc0535bfce041e10c83602e54440cf867a81635b10a7ae132b11cdde5825",
   "claims": [
     {
       "id": "claim_6ce968382a514edb90e74830ccdebef7",
@@ -195,10 +195,170 @@
           "version": "repo-lines-v1:sha256:7ef1873b30d8420a5f483c882f53c472a9a66cdd2300c0a6b2eb017f7231fb8b:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjkzMzljMzIxNmJjMDNjMjFmNDQzYzdhYjdmN2M2Y2JmMDFmMTUwZmIyMjVjMzcwNGRjOWQ2NTdhYWM5Y2QyZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDkxMzU2OTQ0NGM1ZjQwZjJiMTZkZmU3Y2EyYzc2YWJhYjgwODk2M2RiMTY1ODM5OGU2ODY5YmNiODg2ZWUzNyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmNlZmM3YzlhOGMyNDMyNmM2MGIwMGNjN2E3YzIyZjMxMTQzNWE0OWFmMTMzNzg2ZDczZWExOTcwNTIwNzMzNyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGViMjc1MTdkNmUzZjFiMDA4MTUyN2MxZDdhNzRlMTJjMjU2ZGZhZjhkOTRkNDllM2UwYTE4MGIxM2NmZDAwMiJ9"
         }
       ]
+    },
+    {
+      "id": "claim_04caf16e4d9445dbaa98904f53071b72",
+      "statement": "Middleware implements rate limiting and throttling by tracking call counts and timing in agent state; can use thread-level (persistent across runs) and run-level (per invocation) limits; exponential backoff with optional jitter prevents thundering herd problems when multiple agents retry simultaneously.",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/_retry.py#L98-L120",
+          "version": "repo-lines-v1:sha256:09ffe7fbe6c9ff7b3320dff3c6c88a6200ae6dcb1f793a3cdb87cc161dfd1145:eyJzZWxlY3RlZExpbmVDb3VudCI6MjMsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjBlNGE5MTlmZDRiMWIyNjE4MDhiNGY0MGJkZjk2MWZhOTRlODYzMzI1ZGNjMTU1OWJjOTJjZDY3Njg0YjA5OTIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM3ZmM5ZjVjODY1MjYzOGEzMmRhMDk5YjQzNDVhN2IyNDgwOTg2Njg1MTliNWU2YmQ2N2U2OWJmN2M2Mzk5NzIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImEzNGZkNjk4YjFiNzg2NjJhNDRiZjFiMTMzOGQ0ZDFiYThlYjgyNjBiN2I4ZGNlNzAzMTQ0ZjU0MjBlNjg4MTMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI4NDQ0YTllNmU5ZTFmNDVlY2UwZWE0N2VlYjkwZWVjOTJkODE3OTVkYWZjMmNiZWZlZWRmMTRiYjMzY2ZhYWUifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/model_call_limit.py#L94-L100",
+          "version": "repo-lines-v1:sha256:1d8df15754f161dc2a681be1bccaa47f402b8c583e60afe60ef0949f9c677340:eyJzZWxlY3RlZExpbmVDb3VudCI6NywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNGEyMmFlYWZmYWVkNzUyY2E0YTc2ZDUyYmNlZTYwZmU5ZDRkOTU1YzdhY2FiYzVlNTYxZDZmNTQyM2VlNDAzYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZDM4ZGRkMTU1NzBkYjNlMjRkZWEzYmMwZTMwMDZhZWQ2YmY0YWNkYzU4NjQ5YmYxZTY2ZWExMjQ4ZTFkNWRjMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMjE4YWUwMDM2MmM5NWVkNGQ0ZDNhYjkyZTBiNzU1OGQyMDk1N2VkYmE0NjZlNjRiMTVmMDBmMjcwY2YwMWRmNiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMGY0OTdkZGVlZTRkNDEzYTMyMDAwZmEzODE1NmVhNzljMGNmMDA4OTM2N2U0NDMwNWU5NWI0ODJjNDM1NWNiMyJ9"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/tool_call_limit.py#L141-L150",
+          "version": "repo-lines-v1:sha256:300a0d442b12a9e34f92cbfaecfb71adecec9a346b6be39e3e4abb30a40df785:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0MDI3YmYxNzU1MWFiM2UyZmZjZGVlZWJkMTM3ZDdlNmRjNjcxZDZhNzYyNzlmM2ZkMWIzMTYzNzU2NTcyMmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4OWViYmFiOTZlZTBmNDNlYWE1NGRmYWEwNTI1Yzc5ZjIzYjVhOGRmMmQ2M2MxMGU2Y2EzZWZiNGRiNjE0ZTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIxOGFlMDAzNjJjOTVlZDRkNGQzYWI5MmUwYjc1NThkMjA5NTdlZGJhNDY2ZTY0YjE1ZjAwZjI3MGNmMDFkZjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIwZDdlYjZiYTRlODI2ZDVhMzNhODI4MDdhNWVmYjA1Nzk3NmU2MjVkZjcyYjE5NjkxODkzYzZmN2I0YWViNTYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_580af74b810f4b4081118ab28a3dc60f",
+      "statement": "Error handling middleware implements fallback chains (ModelFallbackMiddleware retries with ordered backup models), retry with backoff (ModelRetryMiddleware, ToolRetryMiddleware), error message injection (ToolErrorMiddleware converts exceptions to ToolMessages), and recovery strategies (return cached results, modify requests, inject recovery hints).",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/model_fallback.py#L1-L30",
+          "version": "repo-lines-v1:sha256:00dfb5d8f604798dbd4c4649dea6a0116faab7a59fa456a0bfdda172d5fb746c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzOWZhODY4Yzc1MDIwNjQ2ZDQyZjcwOTM3YzVhNjY2NmZjZTQxOWRhOTBmYWE5MGM4MDUzZmMwZGFjYTNlYzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImM0NGI5NzE1ZDNkNDA1YTRkNDdjZTc1YTM5YTU4ZmQ5NzNiMjNjYTNmZTAyMWRhNGNmNTAwZjE0MjU2OGM1MTUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6Ijk1MDQzNDkyMGZlM2IxZWM1MTNiZGM5ZjdkNjA4MDYxZjYwNTVjZDcxNWJhYjAzMjA5ZjYwNDExNTE1NmVkZDEifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/tool_error.py#L37-L80",
+          "version": "repo-lines-v1:sha256:cf892d6b28827271685f34985af1b0a9090677c06cdd90631a2e0e5e34f8cbc7:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlNzE4Y2FiZmZmNTk5NTQwYzI4OGY1N2FmZWNjMzRlNzU4NmFiNmU2NjhkOWEzMWFhYzUzNjRiMjdkMTM3NjEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2YTcxNTI1NzJlZTg0ZjEwOTA2Yzc0YjlmMmE5MjQzNGRkYWIwZTNjNDI4MTNiMDRlNTk3ZWZjZWM5NTFiMjYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0YzUwY2M2MWQ0ZjliYTllNDgyYzI5NDExMDliMDkyZmM3MGZkMGRhNTAzNDVkYzhhNzA3MWNjZDliM2EzZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjNlNDM0OTFhYmY5MGNmMTA1OWQzOTNmOWNhODk5MTM3ZGU3ZWZjODA0NGJmYmMyOWZkYjdmYjNkN2JhZTQ2ZmEifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/tool_retry.py#L32-L50",
+          "version": "repo-lines-v1:sha256:6c268806b0cc4e20961ee4d58a498b0f68481cf55b2a34eabec134d8a2c15950:eyJzZWxlY3RlZExpbmVDb3VudCI6MTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImYyOWUwZTVkOTZhZDgyZGJjOGZlMTgyOThmNGU4NTBhZTcyYzZhZGU1Mjc1MzMwOTA3ZWEwZTc5NDk3MDJiNjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUwZjVkZTNiZTA5ODE1ZDkzMDdjZTg4N2FiZjAwYzBlYjU2OTI2YTk0YmQwZDJiMWZlZDI4NmZkMjQ2M2FhNmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM2MGQzMWI0YjhkMDBmZjQ1MWIwYzEwN2E0ODIyNWE2ZjYzNjljNGQ1OWI5YjQyNzc1OGUwZDM4YjA0YmQ0NGYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImNkNjY2Nzc4NmFkNjc0YjkwMGZhZjk3ZmE4ZTg4ZGZlOTZhNjQ1Yjk2MTc3YjkxYzIzNzVhZDIyMDQ4OTJlNjkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_ac786636016549d7a6b80bbdc6dd36ce",
+      "statement": "Middleware integrates with observability via trace_policy (controls what is captured in LangSmith spans), automatic hook naming in traces as {middleware_name}.{hook_name}, and logging best practices avoiding PII exposure by logging summaries instead of content.",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/factory.py#L263-L352",
+          "version": "repo-lines-v1:sha256:3ec5f1feb4635cf89ce4ed047913069ea65450eac07e35e74407fedf8bfcc0c7:eyJzZWxlY3RlZExpbmVDb3VudCI6OTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRjYzc5ZDE5ODU5MjBiNjg0M2MzNGQ2MmI4OTkwZjQyMmU1ODU2MDdkNmMwZGFiM2QzNzY4NDUxMDY5YTg2M2QiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEwYzU0YTZhOWIyM2NlNDRiMjM4MDBkODQ5N2UxOTk3NWUyNWJiNWJiYmJjYjg4YTA0YjJhYzYzOGZkNDQ2ZjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjQ4ZTAxMzMzMWUxNDU2ZGJjZDc1NjliOTY0ZTA1NWNlNGNkZWE4MGJjZWI4MmMwOWIwZjU2NTllNDkzYjI3ZGUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjA1NDljYmFlMmJkMGQ1NTgxZmJiZWE3Y2U0MDA1M2NkZWU5ZDAzN2ZkNWE2MmU0NTUyYjE5ODlkM2Y1NDZlYWUifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/tool_error.py#L82-L82",
+          "version": "repo-lines-v1:sha256:cf1a1e8504c89c90b01d6a80b7ee55b0cbcad23f7375cf1cecb2be8f622475b6:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiY2YxYTFlODUwNGM4OWM5MGIwMWQ2YTgwYjdlZTU1YjBjYmNhZDIzZjczNzVjZjFjZWNiMmJlOGY2MjI0NzViNiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiY2YxYTFlODUwNGM4OWM5MGIwMWQ2YTgwYjdlZTU1YjBjYmNhZDIzZjczNzVjZjFjZWNiMmJlOGY2MjI0NzViNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjcyYTg1MDYzMWIyMjkwZWUyZjM3ZjBkYTJkMzRiMDI2MTA1YTQ0ZjMwNTg2YWQwZTUxNzg1YzJmODQ1NWYwZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDMzMTA5NWQ1ZmQ5NDk3ZjQzZGQ2OTAxYTkzZjc0M2JiNjU1NTA2YTA1MGUxNWMyODE1YmYxYzlkNGYxMzI5OCJ9"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/types.py#L403-L411",
+          "version": "repo-lines-v1:sha256:c1763344c9294fe2d4b01d56225f97942d1faa5fd1d004fc088d1fc357aec39b:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYjU3OTBlZjUyNjU2ZWVmYmE1ZGJhOGNjNzM4MWRmNzVjNDY0OGU3NWMyNDMwNGE5ZmExZDM4MTM2MGU5ZThjOSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZhNzE1MjU3MmVlODRmMTA5MDZjNzRiOWYyYTkyNDM0ZGRhYjBlM2M0MjgxM2IwNGU1OTdlZmNlYzk1MWIyNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNWY0NWFhNThlYmM3MmZjNDlkNDFkOTA5ZmM0NjAwNDY4MmMwN2Q4MzRhNWU1YjUxYjY5NmU2Y2M2ODc1N2I3NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiOGFlN2EwY2FiYzQ1MGNhNDk5ZTE4OWI3NjIzZjBjNGRkZGQ5OGQ0ODgzNmJmNzQ2N2FlY2ZkZmMwNWUzNWE4ZiJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_eca1e377247e4bca9938258d201d98aa",
+      "statement": "ModelFallbackMiddleware wraps a primary model with ordered fallbacks; sanitizes provider-specific cache settings (Anthropic cache_control, Fireworks session affinity) before each fallback attempt to ensure compatibility; provides graceful degradation for reliability and cost optimization.",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/model_fallback.py#L1-L11",
+          "version": "repo-lines-v1:sha256:c7452002aac801b0eabedffef05d6d98e1b096560bc86a26e25aacc59430cf36:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIzOWZhODY4Yzc1MDIwNjQ2ZDQyZjcwOTM3YzVhNjY2NmZjZTQxOWRhOTBmYWE5MGM4MDUzZmMwZGFjYTNlYzUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzMDNlY2RkNGE0ZDEwZjE5YzczZmQ0MmZkMTI0MzdmZDMzNTRhODI2ODE2MDVkYTUyNTVhOTdhMzkwNjhkYmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU1YjZlODcwNmI0MzA0N2YyYTZkYjY3ZjEzMjYzODU5NTYwNGU2N2YzNjk2Njg3NmNlMDE1OGYwMDUzZTZiZDEifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/model_fallback.py#L113-L167",
+          "version": "repo-lines-v1:sha256:d70c316b1f241ce21ad745955d401c8618caa52afe5cda373bba45385d85312e:eyJzZWxlY3RlZExpbmVDb3VudCI6NTUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJjNjhiMjViZGRkMjg2Y2ZmNjQxZGEzMGZiNzRiYzhmOGNlYTg2M2IxYmRkODVmODgwY2Q2ZmFkMzg5NmUxMzMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM1OGQwNDNkOWZkNjEyNTU0ODg1YTg0YTFlMWJmNzkwN2FjNjcyMDdmNzU5OTFhODFmYjczNWU2MDQ4NmMyNWYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImI3OTM5OTIxZWVjMzE4Mjc1MzBhYmQzMGQzNDMzNGI4NWJjN2M4OGMwMGUxMGEzNzZlNzUwYTBlZTMwY2FiNjMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_833f040c80ea4aa9ac867ccf87deb931",
+      "statement": "ModelCallLimitMiddleware and ToolCallLimitMiddleware track call counts at thread and run levels (via separate state fields); support configurable exit behavior ('continue' blocks exceeded calls with error messages, 'error' raises exception, 'end' stops execution and injects explanatory messages); provide selective limiting per tool or global limits.",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/model_call_limit.py#L94-L127",
+          "version": "repo-lines-v1:sha256:0f5f15c65d0df231fa123b0583f37147cc47832eb69309b157530d0aad3aa582:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRhMjJhZWFmZmFlZDc1MmNhNGE3NmQ1MmJjZWU2MGZlOWQ0ZDk1NWM3YWNhYmM1ZTU2MWQ2ZjU0MjNlZTQwM2MiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI1YThlNDMyOWU0MTAxYjRiNDljNmQyZjg3MzI2Mjc0OTY0NTdiMzY1NTRkNDFkYTI2ZjI1MGVjM2NhOGIwZWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIxOGFlMDAzNjJjOTVlZDRkNGQzYWI5MmUwYjc1NThkMjA5NTdlZGJhNDY2ZTY0YjE1ZjAwZjI3MGNmMDFkZjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM2MDM1YTIyODY3NmRmNzhjMjhiYWIyMGQ1NTUyZTE3NzAzNjA5ZjhhZWE1OTQ0MGViMTg2MmJiNWZjZjYyYzgifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/tool_call_limit.py#L141-L150",
+          "version": "repo-lines-v1:sha256:300a0d442b12a9e34f92cbfaecfb71adecec9a346b6be39e3e4abb30a40df785:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ0MDI3YmYxNzU1MWFiM2UyZmZjZGVlZWJkMTM3ZDdlNmRjNjcxZDZhNzYyNzlmM2ZkMWIzMTYzNzU2NTcyMmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI4OWViYmFiOTZlZTBmNDNlYWE1NGRmYWEwNTI1Yzc5ZjIzYjVhOGRmMmQ2M2MxMGU2Y2EzZWZiNGRiNjE0ZTciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjIxOGFlMDAzNjJjOTVlZDRkNGQzYWI5MmUwYjc1NThkMjA5NTdlZGJhNDY2ZTY0YjE1ZjAwZjI3MGNmMDFkZjYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjIwZDdlYjZiYTRlODI2ZDVhMzNhODI4MDdhNWVmYjA1Nzk3NmU2MjVkZjcyYjE5NjkxODkzYzZmN2I0YWViNTYifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/tool_call_limit.py#L23-L33",
+          "version": "repo-lines-v1:sha256:4b2de5ebff27589261f110e1e203cdccd2640dce55d649552a1cf39051e0877f:eyJzZWxlY3RlZExpbmVDb3VudCI6MTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhlYjcxNjJkMmM1Mjg3ZDE0MDMxMzgwNzdiMWU2NjRhMjQ5MDE0MmFkMGNkY2Q5Y2M2NWUwZDEzMDg3NDkzMmQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEzMDNlY2RkNGE0ZDEwZjE5YzczZmQ0MmZkMTI0MzdmZDMzNTRhODI2ODE2MDVkYTUyNTVhOTdhMzkwNjhkYmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY2NmFjMDMxZmFkYmI3YjFiMjdmMzZmNmRhMmUyZTk4ZTVkYjc0YThmMDA4MDQxMmQ2MWI4MzQ3YTM5OTM3NzIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjVlZTVmMTVmZWRkYWYxYmZkN2ZkZjFiNjZkYTcyMjE5ZmY4NjI4NjdjMDU4ODFmODIxYjZiNjc1OGZhZTMwOTkifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_c978271b2122466db2c43804500021b9",
+      "statement": "PIIMiddleware detects personally identifiable information in prompts, model responses, and tool outputs; supports configurable strategies ('block' halts execution, 'redact' removes PII, 'mask' obscures values, 'hash' creates consistent tokens); granular per-detector strategy control enables different handling for different PII types.",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/_redaction.py#L16-L17",
+          "version": "repo-lines-v1:sha256:208f3e1ad12c6f3438fcac28f173b4f36e3a61b60465f92b0a3c68c445e5f535:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZjliN2EyNzEyNDMzODg2YjAyOGQ0YWMwMjBhYmU1NmI3MmFkNWNmOTEwMGI2MjRiZjQ1ZDg4NDUzNjY3MzNiNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNzNjMjEyMDI5OTkxZmRiYTE0Y2Q2ODY2NWE5NWJlYWUxMjRiZmRjZWFiMmNjOTcxYzU1ZjA3M2UyYTQwYzFkMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNDIzMTk3NDA0ODQ1OTVkNWFjMTk4ZTJiMzViMzM2Y2ExNzM0ODgwNDQ4M2NlZjU5M2UxNGRhNTM4M2M2MGM4NiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2MwZTA0ZDE0MDVkMmI0NzY0ZDhiYzQyMzk0N2E5MTA0NjY0YWI4MWZiMDk1ZjYzYjM3YWRmMTlkNzdiYWZiNCJ9"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/pii.py#L495-L550",
+          "version": "repo-lines-v1:sha256:926ccf356c0461c07d4110ae6764c573e6da0da2dbead5629c3ccc84ba5a0f3f:eyJzZWxlY3RlZExpbmVDb3VudCI6NTYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUyYzkyOTIzY2FiODBlZGQ0Nzk3OWI3NWYzZjRkYWMzYzc5NGYyNWZkYzA0YzJiYmQzOTc2YTZlNTE1ZmU0NDgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVjYmFhMTM5OThjMDBmYjdmOGI4YWQ2MGNlZDUyMTgzOTIwOWI2OTNhNDE1NjdlMzUwMzM3NjJhY2U2NzljMjMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVmNTk4YzcxYTNkMWRkMDkwOWE1MjMwMWI2ZDZhZDhlMGE3ZTA2YTk4MTFjNmI0YTMxMDI5ZDUzYzFhN2Y1ZDEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjViMzg1Y2Q2ZmZmNzc4N2Q1NDYxNGRkOGIxMWZhOTI2MWJhYjI1NjczMGVmNDFlYTI3MTVlMDY2NTE1MGQ2ZGQifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_19f58a6f65c748faa1bee6f01f9d405a",
+      "statement": "ContextEditingMiddleware allows dynamic modification of agent context (system message, available tools) during execution based on state or external events; supports strategies like 'clear_tool_uses' to manage context window.",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/context_editing.py#L193-L223",
+          "version": "repo-lines-v1:sha256:7545210b7db9973f7993dfcf73a1bcf36608a38c86a04ffbc132f5aa5aecd84c:eyJzZWxlY3RlZExpbmVDb3VudCI6MzEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImUzZjlmYTNiODUwZWI1MjNjMTc4N2I0YTI1YzA1ODNjOTljZmJjNjk2NjQwZTMwM2E2MzljZjdlZDlmNzc0ODciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQ3OTU3NTJkOTc1YWJjZWI2N2RiZTE1NjlmZjZkMjZkZjk1OGViYTYxMDIzOGJkZGFlNDgzYzJhYzI1YzVmODQiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjM5MWZiOTYzOTE5ZDgzNTI5NTUzOTY0NDMzMTJjYWQ3NWZlZjQ1OTAxMGVmMTdhNzJkNzFhYzBhNmE1MjAxNmYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjBjNDg0ZWIwMjhhZGI4ZjE2YzA5MDg3OWFkZmFhZDE3NzliMTI0NTYwNjVmZTQxYTAyNWI4NzY1OGZjM2IzNmIifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/context_editing.py#L45-L92",
+          "version": "repo-lines-v1:sha256:12168a3b4ac982528f973f8b274ae10ff8cc8e5a681f6b4d582c54cd72a032ba:eyJzZWxlY3RlZExpbmVDb3VudCI6NDgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjkzZWU0MWE0ZTE2NTUxNDc1YmU1Y2NjYzQ2ODUyNmNkYTg0Y2VkMmVkOWNiZjgzZjE3N2MxNzFiYTAwODU1NDEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdjMTRiYzhiMjkzOTMxYTMxZDhiZTBmMjU2MTNhZDlkYjBlYjRlYzk1YjZkYWViZmRhMzdiMWRkMDNmNWE4MWMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjFhOWQ5ZTRkYzZiYzhlZWVhN2ZiZTkxODkxMzNjOWI1MGYwNTA5YjBhNTdmY2ZmYzJjZjViMGFjYjYzY2RkNTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImQyODA1NDJkNDRiZDhjN2ZmMTRhZmMyMzA3YTVhYzk1MmY0YjE2NDMwOGYzMGJmOGI5MjAzNzg1MDI2ZWZiODUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_3549f975348d47a98f217e6e24801085",
+      "statement": "ShellToolMiddleware provides controlled shell command execution with configurable resource limits, sandboxing (HostExecutionPolicy for direct host, DockerExecutionPolicy for container isolation, CodexSandboxExecutionPolicy for syscall restrictions), timeout enforcement, and output truncation; critical security boundary in untrusted environments.",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/_execution.py#L56-L99",
+          "version": "repo-lines-v1:sha256:4394a212f5b2342071e7bb855163ae14fce4becfab472c2c171745c51a51eb81:eyJzZWxlY3RlZExpbmVDb3VudCI6NDQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2ZmJhZTBiOTFkNDRmYzBkNDlmNWRlNjkxZGE2ZmM0MzFmMjYwMTM0YmY3MzFlMGUyMWY3NjQ4MDk0MzM0Y2IiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxNDk5YTJmZTBjNGYxY2UwNTI4YzQ4MDA2MGY0MmU1MDM2Y2VmOTg5ZDQ2MGYwYTI4MTEyMGZjOGZmMWFmY2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjVlMDhlNDBmYjE3ZjRjM2RlYTU3Mjk2ZTIzNjA2YWI5MmU3ZmE1Yjk2MGQ2YjYwM2ZiNTVhMGJkN2I4NWQwNjIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ4ZGFiMzJjMmRkNjUyZmMwNTlmOWZlNTY5YjI2N2FiZTJiMzYwMDBkZGM3ZGU1OTQ2ZTk3MzBmMDEyNjJlZTMifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/shell_tool.py#L528-L528",
+          "version": "repo-lines-v1:sha256:fdbbbb6e1183454de1ad262a355ed05ede82cba997478ffbbd36317277875a4d:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZmRiYmJiNmUxMTgzNDU0ZGUxYWQyNjJhMzU1ZWQwNWVkZTgyY2JhOTk3NDc4ZmZiYmQzNjMxNzI3Nzg3NWE0ZCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiZmRiYmJiNmUxMTgzNDU0ZGUxYWQyNjJhMzU1ZWQwNWVkZTgyY2JhOTk3NDc4ZmZiYmQzNjMxNzI3Nzg3NWE0ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMWZhNmVmNWY3YTZlYzZlMDI2NzJiZDI5ZjI3MTY5ZTkwZDg1MDE5YzNiOGUzN2E2ZGFmODVlNDE4Y2ViYjIxZCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZWE5ZDA3ZTdhNjlmOGM3NzA3ZWNlNjUzNTUyMWJlZTIzZjM5YWRmZmYyZWQxNDdmMGE3NTRjNGYyOWUyN2FhZCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c059cd0af50d4ea5b247d3409341b25a",
+      "statement": "FileSearchMiddleware integrates file search capabilities using glob and grep patterns to retrieve relevant documents before model calls; supports filtering by modification time and path constraints to prevent directory traversal.",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/file_search.py#L1-L10",
+          "version": "repo-lines-v1:sha256:3d6ea43cf372cd2f299122f2bd0f6633e50a1715034a1f220e8b4decb6c8f98d:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNlMTkzNDhjOWYwNWJkNzczOGJjOTU3OWZjMmI0Nzg2ZDc1MTcxNDQ0ZDAzYWY1NzFiNzIyMjExZjEwMTc4MTUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjI2MWE5MTEyYTI5MThlMmFiYTAzZTE5YTJmMjIxYTAyN2FiNGI2ZjllOTQ2YTZjMzk4MTRmNTRlMThlMDdkZmMiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjE0ZTJiMTk4MDU1ZmIyMDk3MThjMGQ2MTBmZjA0OTgyNjU3ODkwZjMzZmU4YmE3NzQ1OTUzZTBiNTZlYzRmYmYifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/file_search.py#L169-L194",
+          "version": "repo-lines-v1:sha256:473a74249fcb06b496a8ed0ce95953181ff86b1338765ee4290b78bb0a2e1330:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdhOTMwNmM0ZmIwZDFjMTc3NGFmN2U5NjUzYjZkOThhNWY1ZWRkOWY1NmIyZTAxZTM1MzMzYzYxNmUzNTNjZWMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjIwMGM4ZTk4YTI5YmNmM2Y1MTczZGJiNjczY2Q5MTg5NTAyNjQ4NDU0ZTI0ZWFjNDE0YmVjOWFjM2U2M2U0YTkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjI4ZjAxMzJmNTZiN2IyNmIwNDM2ZWQ2OTI1Zjk2NWFhZGU0NWE0NjVlOWEzMTU1ZjMxMGEzM2I0OTFiOGVhZGIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjAzZWVhODFlNjcwNWZhZmNiNmMyNDAyZWU3MTNmMDc5OWQ3OGM0YWJkZjIzMjY5NTAzODRmY2FkOWVmMjQ3N2EifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_f594bb8f1d274d32b088ece0c752712c",
+      "statement": "HumanInTheLoopMiddleware sends HITLRequest with ActionRequest (name, args, description) and ReviewConfig (action_name, allowed_decisions) objects; receives Decision objects back (ApproveDecision, EditDecision with edited_action, RejectDecision with optional message, RespondDecision with message); edit decisions store replacements in state for wrap_tool_call to apply with annotation.",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/human_in_the_loop.py#L427-L525",
+          "version": "repo-lines-v1:sha256:d5b7ad81526ab0894786de5e15377062824c5abe2a939e57d2e3181282bfbb71:eyJzZWxlY3RlZExpbmVDb3VudCI6OTksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZTAxMDE1M2ZkZjExNWY2NWJhMDc2M2QxMjMwYmFiMDVlZGJlMmVlZjAzMTNmN2QwNWMzMDdiYTYwY2MyOGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImU2YjA0NDkxNDY5NzIyZTgzNjNhOTRlNDA0NDUzOGUwMTNhMmEyMTdlMzZiMWU1NjhiYTYwYWNiN2I0YzhmMmUiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ0ZjFkY2I1ZGY0ZmVjZjljOTFkZjUzYWFkNGZmZTMyY2RlNjU0OTlmNmUyMGI2YTZjMTk0ZTgwODU3ZjM4ODYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY5NDIwYTZkZGJmYjhhNWJmZTJhODIxMWU2NjMxODRiZWNhOWI1ZTM3Y2RhYWE5MTZjYjc2YzUyNWY0MWQ1MWQifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/human_in_the_loop.py#L52-L142",
+          "version": "repo-lines-v1:sha256:221107fa6d209ed95b18516ca636836c1385fafb148723b92f803a95cd52d39f:eyJzZWxlY3RlZExpbmVDb3VudCI6OTEsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjhmMzA3MmMyYjY3MGEwYjc1ZjRkODRhM2UwODE0ODQzMTZjOTNiMjFkMTUyNjM3ZmEzZGY2NzA3MTJmMDIxNGIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijk0Njk3ZWQzZDg4ZTQ5YTNhODljMTBjNDFjOTU3M2E5OTg1MGJiOTFjOGRhZTVlNWEwM2JhMjJkYzc5OTQ4MjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ1OGIyNGIxMjk5OGJiNjQ4MTZhOWYzYzMwN2ZkODVjOGU5MjUzMWQ2ODQzNzYzNGNlOWM2NTQ4N2Q2MGFmYTcifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/langchain/agents/middleware/human_in_the_loop.py#L541-L577",
+          "version": "repo-lines-v1:sha256:48e15a5cb6fc7b73beba33b6dacd10da9d0c18d97848d6bb9d4aef9bb9474e14:eyJzZWxlY3RlZExpbmVDb3VudCI6MzcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRkMGZkOTI4ZjAxZjZmOGJlNzNkNDYzZWUzOWIwZWFkMDc0ZTYwYzE1ZDczMjBiNDJhYWUxM2Q2OTA3Njg5ZjIiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImQ3ODdmOTg4ZTQxYjVlOGEzY2M5Njk0N2JkNDQzYjE4NjFkNjI5ZjYxMjBiNDhmZDY5Yzg4NGI1MjhiZDc3NjUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjQ3OTQwMWU1ZTg4ZDViNTIwYzRmYWM5ZTAxOTcyNDdhZmJmNzEzYzhlZmExMzBlOWFjM2M4ODFmYWIwY2EyZTEifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-28T08:35:20.640Z"
+    "at": "2026-10-11T08:26:15.994Z"
   }
 }

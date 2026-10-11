@@ -1,8 +1,11 @@
 ---
 type: "Developer Tools & Commands"
 title: "Development Commands and Local Setup"
-description: "Quick reference for uv, make, lint, test, and type-checking commands in the LangChain monorepo, including environment setup, pre-commit hooks, and testing workflows."
-tags: [development, build, testing, linting, typing, uv, make, pre-commit, local-setup]
+description: "Quick reference for uv, make, lint, test, and type-checking commands in the LangChain monorepo, including environment setup, pre-commit hooks, testing workflows, and debugging."
+tags: [development, build, testing, linting, typing, uv, make, pre-commit, local-setup, debugging]
+verified:
+  - by: openwiki/0.5.0
+    at: 2026-10-11T08:26:15.994Z
 sources:
   - id: openwiki-source-4d1645cb6317345817452838
     resource: repo://.pre-commit-config.yaml
@@ -14,21 +17,20 @@ sources:
     resource: repo://libs/core/pyproject.toml
   - id: openwiki-source-7c96a74af67942d40559bf7d
     resource: repo://libs/langchain_v1/Makefile
+  - id: openwiki-source-ba4876d385d4d18ed4fa0342
+    resource: repo://libs/langchain_v1/pyproject.toml
   - id: openwiki-source-f708a9db48bfcf1b154e4708
     resource: repo://libs/langchain/Makefile
   - id: openwiki-source-49fbcc45434b619b68220bf9
     resource: repo://libs/Makefile
   - id: openwiki-source-a6e669bb11f217c6fbd06670
     resource: repo://libs/partners/anthropic/Makefile
-generated: { by: "openwiki/0.5.0", at: "2026-09-03T15:18:34.589Z" }
-verified:
-  - by: openwiki/0.5.0
-    at: 2026-09-28T08:35:20.640Z
+generated: { by: "openwiki/0.5.0", at: "2026-10-11T08:26:15.994Z" }
 ---
 
 ## Overview
 
-The LangChain Python monorepo uses `uv` for dependency management, `make` for task automation, and `ruff`/`mypy` for code quality. This page provides a quick reference for common development commands and setup workflows.
+The LangChain Python monorepo uses `uv` for dependency management, `make` for task automation, and `ruff`/`mypy` for code quality. This page provides a quick reference for common development commands, setup workflows, and debugging techniques.
 
 ## Initial Setup
 
@@ -100,6 +102,36 @@ make test TEST_FILE=tests/unit_tests/agents/test_agent.py
 uv run --group test pytest tests/unit_tests/agents/test_agent.py
 ```
 
+### Parallel Test Execution
+
+Tests run in parallel by default with `-n auto` (xdist). Control parallelization:
+
+```bash
+# Run serially (useful for debugging)
+make test PYTEST_EXTRA="-n0"
+
+# Run with specific number of workers
+make test PYTEST_EXTRA="-n4"
+```
+
+### Test Filtering and Selection
+
+Filter tests by pattern, marker, or path:
+
+```bash
+# Run tests matching a pattern
+pytest -k "test_agent" tests/unit_tests/
+
+# Run only tests marked with @pytest.mark.extended
+make extended_tests
+
+# Run tests with verbose output
+make test PYTEST_EXTRA="-vv"
+
+# Run a specific test class and method
+pytest tests/unit_tests/agents/test_agent.py::TestAgent::test_method
+```
+
 ### Integration Tests
 
 Integration tests live in `tests/integration_tests/` and require network access and API keys. Run them separately:
@@ -135,6 +167,12 @@ make coverage
 
 This produces `xml` and term-missing reports, useful for understanding untested code paths.
 
+For agent-specific coverage (in `langchain_v1`):
+
+```bash
+make coverage_agents
+```
+
 ## Linting and Formatting
 
 ### Run Full Linting Suite
@@ -156,6 +194,32 @@ make format
 
 This applies `ruff format` and `ruff check --fix` to auto-fix formatting and logical issues (e.g., unsorted imports, unused variables).
 
+### Ruff Configuration
+
+Ruff is configured in each package's `pyproject.toml`. Common settings:
+
+```toml
+[tool.ruff]
+line-length = 100  # Line length limit
+
+[tool.ruff.format]
+docstring-code-format = true  # Format code in docstrings
+
+[tool.ruff.lint]
+select = ["ALL"]  # Enable all rules
+ignore = [
+    "C90",     # McCabe complexity
+    "COM812",  # Messes with the formatter
+    "CPY",     # No copyright
+    "ANN401",  # Disallow untyped Any
+    "BLE",     # Blind exceptions
+    # ... per-package exceptions
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"  # Enforce Google-style docstrings
+```
+
 ### Ruff-Only Commands
 
 Format and linter can be run separately for faster iteration:
@@ -168,30 +232,50 @@ ruff format . --diff
 # Fix formatting and lint issues
 ruff check . --fix
 ruff format .
+
+# Check specific file or directory
+ruff check libs/core/langchain_core/runnables.py
 ```
 
 Run from within a package directory or from the repo root. Ruff processes Python and Jupyter notebooks.
+
+### Lint Changed Files Only
+
+Run linting on files changed relative to master:
+
+```bash
+make lint_diff
+make format_diff
+```
+
+This is useful for incremental development without checking the entire codebase.
 
 ### Type Checking
 
 Full type checking with mypy:
 
 ```bash
-mypy .
-```
-
-Or use the make target:
-
-```bash
 make type
 ```
 
-This checks all Python files for type errors (e.g., incorrect argument types, missing type hints). Type checking can be slow for large packages; run it with:
+Or use mypy directly:
 
 ```bash
-# Type check specific file or directory
+mypy .
 mypy libs/core/langchain_core/runnables.py
 ```
+
+Mypy configuration enforces strict type checking:
+
+```toml
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+strict = true
+enable_error_code = "deprecated"
+warn_unreachable = true
+```
+
+Type checking can be slow for large packages. For faster iteration, type-check specific modules or use the `--cache-dir` flag.
 
 ## Testing a Single Package
 
@@ -235,7 +319,7 @@ cd libs && make lock
 cd libs && make check-lock
 ```
 
-The `.pre-commit-config.yaml` includes `UV_FROZEN = true`, which prevents unexpected lock file changes during regular development. Use the commands above when intentionally updating dependencies.
+The `.pre-commit-config.yaml` sets `UV_FROZEN = true`, which prevents unexpected lock file changes during regular development. Use the commands above when intentionally updating dependencies.
 
 ## Make Commands Reference
 
@@ -318,7 +402,77 @@ mypy libs/langchain_v1/langchain/agents/agent.py
 
 # Type check tests (faster, uses test group)
 cd libs/langchain_v1
-make lint_tests
+mypy tests/unit_tests/agents/
+```
+
+## Debugging and Profiling
+
+### Verbose Test Output
+
+Enable verbose output to see test names and timing:
+
+```bash
+# Very verbose with test names and output
+make test PYTEST_EXTRA="-vv"
+
+# Show print statements in tests
+make test PYTEST_EXTRA="-s"
+
+# Show duration of slowest tests
+make test PYTEST_EXTRA="--durations=10"
+```
+
+### Using pdb (Python Debugger)
+
+Drop into an interactive debugger in test code:
+
+```python
+import pdb; pdb.set_trace()  # Execution pauses here
+```
+
+Run tests with `-s` (capture=no) to interact with the debugger:
+
+```bash
+make test TEST_FILE=tests/unit_tests/agents/ PYTEST_EXTRA="-s"
+```
+
+Or run a single test with breakpoint():
+
+```bash
+uv run --group test pytest tests/unit_tests/agents/test_agent.py -s --pdb
+```
+
+### Profiling Tests
+
+Profile slow tests to identify bottlenecks:
+
+```bash
+# Core package: profile with speedscope output
+make test_profile
+
+# LangChain v1: run benchmark tests
+make benchmark
+
+# Generate coverage-guided profiling
+make test PYTEST_EXTRA="--codspeed"
+```
+
+### Pytest Debugging Options
+
+Common pytest flags for debugging:
+
+```bash
+# Stop on first failure
+make test PYTEST_EXTRA="-x"
+
+# Show local variables in tracebacks
+make test PYTEST_EXTRA="-l"
+
+# Show pytest internals (useful for fixture debugging)
+make test PYTEST_EXTRA="-vv --setup-show"
+
+# Run a single test and drop into debugger on failure
+pytest tests/unit_tests/test_file.py::test_name --pdb
 ```
 
 ## Environment Variables
@@ -336,6 +490,16 @@ Example: Run fast tests with extra pytest verbosity:
 
 ```bash
 make test PYTEST_EXTRA="-vv" TEST_FILE=tests/unit_tests/agents
+```
+
+For `langchain_v1`, choose between Docker-backed or in-memory services:
+
+```bash
+# Use Docker services (full integration testing)
+LANGGRAPH_TEST_FAST=0 make test
+
+# Use in-memory services (fast unit testing)
+LANGGRAPH_TEST_FAST=1 make test_fast
 ```
 
 ## Troubleshooting
@@ -386,8 +550,25 @@ uv sync --all-groups
 pre-commit run --all-files
 ```
 
+### Docker services fail in langchain_v1
+
+```bash
+# Start services manually
+make start_services
+
+# Run tests
+make test_fast
+
+# Stop services
+make stop_services
+```
+
+### Pytest socket warnings
+
+Unit tests are restricted to prevent accidental network calls. If you need network access in a test, move it to `tests/integration_tests/`.
+
 ## Related Documentation
 
 - [Contributing Guide](repo://AGENTS.md): Detailed development conventions, PR templates, and code standards
-- [System Architecture](repo:///openwiki/architecture.md): Three-layer design and module responsibilities
-- [CI/CD Workflows](repo:///openwiki/ci-workflows.md): GitHub Actions automation and release process
+- [CI/CD Workflows](/openwiki/ci-workflows.md): GitHub Actions automation and release process
+- [Unit Tests](/openwiki/unit-tests.md): Test organization, fixtures, and mocking strategies

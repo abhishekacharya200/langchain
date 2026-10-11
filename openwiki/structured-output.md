@@ -1,445 +1,601 @@
 ---
 type: "Reference"
 title: "Structured Output and Response Formatting"
-description: "Document the structured output system: response format specification, strategy selection (auto, provider, tool-based), parsing, validation, and middleware integration."
-tags: [structured-output, response-format, agent, schema, validation, middleware]
+description: "Constraining model outputs to structured formats via with_structured_output, schema conversion, provider-specific patterns, and output parsers with validation and streaming support."
+tags: [structured-output, response-format, schema, validation, output-parsing, streaming]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-28T08:35:20.640Z
+    at: 2026-10-11T08:26:15.994Z
 sources:
+  - id: openwiki-source-132f3183693cd9cf79d029a5
+    resource: repo://libs/core/langchain_core/language_models/base.py
+  - id: openwiki-source-c52037e7b642f7ac5a7642a8
+    resource: repo://libs/core/langchain_core/language_models/chat_models.py
+  - id: openwiki-source-b6969337572a90d4b6262e7b
+    resource: repo://libs/core/langchain_core/output_parsers/json.py
+  - id: openwiki-source-d89c127dbba78772dc5369ed
+    resource: repo://libs/core/langchain_core/output_parsers/openai_tools.py
+  - id: openwiki-source-50275a07684ed251c972e512
+    resource: repo://libs/core/langchain_core/output_parsers/pydantic.py
+  - id: openwiki-source-716439ad921db0ba7cb11ebf
+    resource: repo://libs/core/langchain_core/utils/function_calling.py
   - id: openwiki-source-71e882e1ac9757ea8e959a7c
     resource: repo://libs/langchain_v1/langchain/agents/factory.py
   - id: openwiki-source-ec30ab6256dd50cc670919f6
     resource: repo://libs/langchain_v1/langchain/agents/structured_output.py
-generated: { by: "openwiki/0.5.0", at: "2026-09-28T08:35:20.640Z" }
+  - id: openwiki-source-738512768ef81ae009b097ac
+    resource: repo://libs/partners/openai/langchain_openai/chat_models/base.py
+generated: { by: "openwiki/0.5.0", at: "2026-10-11T08:26:15.994Z" }
 ---
 
 ## Overview
 
-Structured output is the mechanism that ensures a language model returns responses matching a specific JSON schema. Rather than receiving unparsed text or tool calls, agents can enforce that model outputs conform to Pydantic models, dataclasses, TypedDicts, or raw JSON schemas. The factory configures one of three strategies—tool-based, provider-native, or automatic—each with different tradeoffs around compatibility, validation, and retry behavior.
+Structured output is the mechanism that constrains language model responses to match a specific schema. Rather than receiving unparsed text, applications can ensure that model outputs conform to Pydantic models, dataclasses, TypedDicts, or raw JSON schemas using `with_structured_output()` on chat models. The implementation supports multiple binding strategies—function calling (tool-based), provider-native APIs, and JSON mode—each with different tradeoffs around model compatibility, validation, and error recovery.
 
 ### Core Concept
 
-When an agent is created with a `response_format` parameter, it tells the model "all your responses must match this schema." The agent:
+When a model's `with_structured_output(schema)` method is called, it returns a `Runnable` that:
 
-1. **Registers** the schema as an artificial tool (for tool-calling strategy) or sends it to the model provider's native API (for provider-native strategy)
-2. **Detects** whether the model supports native structured output (AutoStrategy)
-3. **Parses** the model's response against the schema using Pydantic's `TypeAdapter` for validation
-4. **Retries** automatically on validation errors (if enabled via `handle_errors`)
-5. **Stores** the parsed result in `structured_response` state field
+1. **Binds** the schema to the model using a strategy (tool calling, provider API, or JSON mode)
+2. **Invokes** the model with the schema constraint
+3. **Parses** the model's response against the schema using validation
+4. **Returns** either the parsed structured object or a dict with raw/parsed/error fields
 
 This is distinct from tool calling—structured output constrains the response itself, not the model's tool invocations.
 
-## Response Format Strategies
+## with_structured_output() Pattern
 
-Three strategies control how structured output is enforced:
+The `with_structured_output()` method is available on all chat models implementing the `BaseChatModel` interface.
 
-### ToolStrategy: Tool-Based Structured Output
+### Method Signature
 
-The model is presented with an artificial tool whose name and arguments match the schema. When the model calls this tool, its arguments are parsed and validated against the schema.
+```python
+def with_structured_output(
+    self,
+    schema: dict[str, Any] | type,
+    *,
+    include_raw: bool = False,
+    **kwargs: Any,
+) -> Runnable[LanguageModelInput, dict[str, Any] | BaseModel]
+```
+
+### Core Parameters
+
+- **schema**: The output schema. Can be:
+  - A Pydantic `BaseModel` class
+  - A `dataclass` class
+  - A `TypedDict` class
+  - A raw JSON Schema dict
+  - An OpenAI function/tool schema dict
+
+- **include_raw**: If `False`, only the parsed structured output is returned. If an error occurs during parsing, it is raised. If `True`, returns a dict with keys `'raw'` (the `BaseMessage`), `'parsed'` (the parsed result or `None`), and `'parsing_error'` (the exception or `None`).
+
+### Return Value
+
+- If `schema` is a Pydantic class and `include_raw=False`: Returns a `Runnable` that outputs an instance of `schema`
+- If `include_raw=False` with other schema types: Returns a dict with the parsed output
+- If `include_raw=True`: Returns a dict with keys `'raw'`, `'parsed'`, and `'parsing_error'`
+
+## Binding Strategies
+
+The actual mechanism for constraining output depends on the chat model implementation. `BaseChatModel` provides a default implementation using tool calling, but provider-specific implementations override it with native APIs when available.
+
+### Tool-Based Strategy (Default)
+
+When `with_structured_output()` is not overridden by a provider, it uses tool calling:
+
+```python
+# Default implementation in BaseChatModel
+llm = self.bind_tools(
+    [schema],
+    tool_choice="any",
+    ls_structured_output_format={
+        "kwargs": {"method": "function_calling"},
+        "schema": schema,
+    },
+)
+```
 
 **Lifecycle:**
-
-1. Schema is wrapped as a `StructuredTool` with the schema's JSON schema as `args_schema`
-2. Tool is added to the model's tool list with `tool_choice="any"` to force use
-3. Model generates a tool call with the schema name
-4. Tool call arguments are parsed via `_parse_with_schema` using Pydantic's `TypeAdapter`
-5. Parsed result stored in `structured_response`
-6. Empty `ToolMessage` returned (tool has no real execution)
+1. Schema is wrapped as a tool via `bind_tools()`
+2. Model is forced to call this tool with `tool_choice="any"`
+3. Tool call arguments are extracted and parsed using `PydanticToolsParser` (for Pydantic schemas) or `JsonOutputKeyToolsParser` (for other types)
+4. Parsed result is returned
 
 **Advantages:**
-
-- Works with all models that support tool calling
-- Full validation available for non-dict schemas
-- Automatic retry on validation errors (configurable)
-- Supports Union types (multiple schema variants)
+- Works with all models supporting tool calling
+- Full validation available for Pydantic/TypedDict/dataclass schemas
+- Schema can be any JSON-serializable type
 
 **Limitations:**
-
 - Requires tool calling capability
-- Adds tool to the tool list (may consume tool slot on some models)
-- Raw JSON schema dicts skip validation, making `handle_errors` inert
+- Consumes one tool slot on the model
+- Raw JSON schema dicts are not validated (returned as-is)
 
-**Error Handling:**
+### Provider-Native Strategy
 
-The `handle_errors` parameter controls retry behavior on validation failure:
+Provider-specific implementations (e.g., `ChatOpenAI`) override `with_structured_output()` with native APIs:
 
-- `True` (default): Catch all errors, retry with default error template
-- `False`: Let exceptions propagate without retry
-- `str`: Catch all errors, retry with custom message
-- `type[Exception]` or `tuple[type[Exception], ...]`: Only retry specific exception types
-- `Callable[[Exception], str]`: Custom function returns retry message per exception
-
-Failed parses generate a `ToolMessage` with the error message, allowing the model to correct its output.
-
-### ProviderStrategy: Native Structured Output
-
-The schema is sent to the model provider's native structured output API (e.g., OpenAI's `response_format` with `type: "json_schema"`). The provider enforces schema compliance on their side; the agent only needs to parse the JSON response.
+```python
+# Example: ChatOpenAI with method='json_schema'
+response_format = _convert_to_openai_response_format(schema, strict=strict)
+llm = self.bind(
+    response_format=response_format,
+    ls_structured_output_format={
+        "kwargs": {"method": "json_schema", "strict": strict},
+        "schema": convert_to_openai_tool(schema),
+    },
+)
+```
 
 **Lifecycle:**
+1. Schema is converted to provider format (e.g., OpenAI's JSON Schema API)
+2. Passed to model via `bind()` with provider-specific parameters
+3. Model returns JSON guaranteed to match schema
+4. Response is parsed and validated
 
-1. Schema converted to JSON Schema via Pydantic's `model_json_schema()`
-2. Wrapped in provider-specific format: `{"type": "json_schema", "json_schema": {"name": ..., "schema": ..., "strict": ...}}`
-3. Passed to model via `model.bind(..., response_format={...})`
-4. Model returns JSON text (guaranteed valid by provider)
-5. Text parsed via `json.loads()` then validated against schema
-6. Parsed result stored in `structured_response`
+**Provider Methods (ChatOpenAI example):**
+
+| Method | Provider API | Validation | Strict Mode | Notes |
+|--------|--------------|-----------|-------------|-------|
+| `'function_calling'` | OpenAI tool calling | Full (via parser) | Supported | Default; widest compatibility |
+| `'json_schema'` | OpenAI Structured Outputs API | Provider-enforced | Supported | Stricter guarantees; GPT-4o/GPT-4 Turbo+ only |
+| `'json_mode'` | OpenAI JSON Mode | Partial (user provides format) | Not supported | No schema enforcement; requires format instructions |
 
 **Advantages:**
-
-- Provider enforces schema—no invalid JSON possible
-- Doesn't consume tool slots
+- Provider enforces schema at generation time
+- No tool slot consumption
 - Works alongside tool calling
-- Strict mode available (supported providers only)
+- Strict mode available (guarnteed schema compliance)
 
 **Limitations:**
+- Only available on provider-specific implementations
+- Model compatibility varies by provider
+- No in-model error recovery (provider errors are final)
 
-- Limited to models with native structured output (OpenAI, Claude, etc.)
-- No automatic retry on validation errors (provider side is strict)
-- Must explicitly test model capability support
+## Schema Types and Conversion
 
-**Capability Detection:**
+The `with_structured_output()` method normalizes schema types via conversion utilities in `langchain_core.utils.function_calling`:
 
-A model supports provider-native structured output if:
+### Supported Schema Types
 
-1. Its profile includes `"structured_output": True` (checked via `model.profile`), AND
-2. Not a pre-3-series Gemini model (which cannot mix tools with structured output), OR
-3. Model name matches fallback patterns like `gpt-4o`, `claude-opus`, etc.
+| Type | Example | Validation | Parser |
+|------|---------|-----------|--------|
+| **Pydantic model** | `class Response(BaseModel): ...` | Full via Pydantic | `PydanticToolsParser` |
+| **dataclass** | `@dataclass class Response: ...` | Full via Pydantic conversion | `PydanticToolsParser` |
+| **TypedDict** | `class Response(TypedDict): ...` | Full via conversion | `PydanticToolsParser` |
+| **JSON Schema dict** | `{"type": "object", "properties": {...}}` | None (returned as-is) | `JsonOutputKeyToolsParser` |
 
-### AutoStrategy: Automatic Strategy Selection
+### Schema Conversion Functions
 
-Defers strategy selection until model invocation time. The factory inspects the bound model and chooses:
-
-1. **ProviderStrategy** if the model supports native structured output
-2. **ToolStrategy** as fallback for all other models
-
-**Lifecycle:**
-
-1. User passes raw schema or `AutoStrategy(schema=...)`
-2. Factory converts to `ToolStrategy` upfront to pre-build tools
-3. At model call time, `_supports_provider_strategy()` checks model capabilities
-4. If supported, `ProviderStrategy` is created and model kwargs bound
-5. Otherwise, `ToolStrategy` is used (tools already prepared)
-
-**Advantage:** Best of both worlds—uses provider when available, falls back to tools.
+**`convert_to_openai_tool(schema, strict=None)`** — Converts schema to OpenAI function-calling format:
 
 ```python
-from langchain.agents import create_agent
-from pydantic import BaseModel
+from langchain_core.utils.function_calling import convert_to_openai_tool
 
-class WeatherResponse(BaseModel):
-    """Weather forecast response."""
-    location: str
-    temperature: int
-    condition: str
-
-# AutoStrategy (recommended)
-agent = create_agent(
-    model="openai:gpt-4o",
-    response_format=WeatherResponse,  # Wrapped in AutoStrategy automatically
-)
-
-# Explicit strategies
-from langchain.agents.structured_output import ProviderStrategy, ToolStrategy
-
-agent_native = create_agent(
-    model="openai:gpt-4o",
-    response_format=ProviderStrategy(schema=WeatherResponse),
-)
-
-agent_tools = create_agent(
-    model="openai:gpt-4o",
-    response_format=ToolStrategy(
-        schema=WeatherResponse,
-        handle_errors=True,  # Retry on validation failure
-    ),
-)
-```
-
-## Schema Types
-
-Supported schema types for structured output:
-
-| Type | Example | Validation | Tool Use |
-|------|---------|-----------|----------|
-| **Pydantic model** | `class Response(BaseModel): ...` | Full validation | Yes (via TypeAdapter) |
-| **Dataclass** | `@dataclass class Response: ...` | Full validation | Yes (via TypeAdapter) |
-| **TypedDict** | `class Response(TypedDict): ...` | Full validation | Yes (via TypeAdapter) |
-| **JSON Schema dict** | `{"type": "object", "properties": {...}}` | None (dict schemas skip validation) | Returns dict as-is |
-
-The factory normalizes all types via `_SchemaSpec`, which:
-
-- Extracts schema name (class name, `title` field, or generated UUID fragment)
-- Extracts description (docstring, `description` field, or empty)
-- Computes JSON Schema representation for tool binding
-- Tracks `strict` mode flag for provider-side enforcement
-
-## Integration with Agent Factory
-
-The `create_agent()` function integrates structured output through:
-
-### 1. Upfront Schema Registration
-
-```python
-# At agent creation time
-if tool_strategy_for_setup:
-    for response_schema in tool_strategy_for_setup.schema_specs:
-        structured_tool_info = OutputToolBinding.from_schema_spec(response_schema)
-        structured_output_tools[structured_tool_info.tool.name] = structured_tool_info
-```
-
-Pre-builds `OutputToolBinding` instances wrapping schemas as `StructuredTool` instances. These bindings store the original schema, its classification (`pydantic`, `dataclass`, etc.), and the tool for later parsing.
-
-### 2. Model Binding During Invocation
-
-The `_get_bound_model()` function (called on each model invocation) performs auto-detection:
-
-```python
-# Determine effective response format (auto-detect if needed)
-effective_response_format: ResponseFormat[Any] | None
-if isinstance(response_format, AutoStrategy):
-    if _supports_provider_strategy(request.model, tools=request.tools):
-        effective_response_format = ProviderStrategy(schema=response_format.schema)
-    else:
-        effective_response_format = ToolStrategy(schema=response_format.schema)
-else:
-    effective_response_format = response_format
-```
-
-Then binds the model:
-
-- **ProviderStrategy**: `model.bind(..., response_format={...})`
-- **ToolStrategy**: `model.bind_tools(final_tools, tool_choice="any", ...)`
-
-### 3. Response Parsing
-
-After model invocation, `_handle_model_output()` dispatches to the appropriate parser:
-
-**For ProviderStrategy:**
-
-```python
-if isinstance(effective_response_format, ProviderStrategy):
-    if not output.tool_calls:
-        provider_strategy_binding = ProviderStrategyBinding.from_schema_spec(...)
-        structured_response = provider_strategy_binding.parse(output)
-        return {"messages": [output], "structured_response": structured_response}
-```
-
-**For ToolStrategy:**
-
-```python
-if isinstance(effective_response_format, ToolStrategy):
-    structured_tool_calls = [tc for tc in output.tool_calls if tc["name"] in structured_output_tools]
-    if structured_tool_calls:
-        # Single call: parse args, handle errors, return response
-        structured_response = structured_output_tools[tool_call["name"]].parse(tool_call["args"])
-        return {"messages": [...], "structured_response": structured_response}
-```
-
-## OutputToolBinding: Schema to Tool Conversion
-
-`OutputToolBinding` is the bridge between a schema and a tool. It stores:
-
-- **schema**: Original schema (Pydantic, dataclass, TypedDict, or dict)
-- **schema_kind**: Classification (`'pydantic'`, `'dataclass'`, `'typeddict'`, `'json_schema'`)
-- **tool**: `StructuredTool` instance with `args_schema` bound to the JSON schema
-
-The `parse()` method reconstructs the original type from tool call arguments:
-
-```python
-def parse(self, tool_args: dict[str, Any]) -> SchemaT | dict[str, Any]:
-    return _parse_with_schema(self.schema, self.schema_kind, tool_args)
-```
-
-**Parsing Flow:**
-
-1. For dict schemas: Return arguments as-is (no validation)
-2. For typed schemas: Use Pydantic's `TypeAdapter` to validate Python type
-3. On validation error: Raise `ValueError` with schema name and error details
-
-This allows the factory to maintain a single mapping of structured output tool names to their binding metadata throughout the agent's lifetime, enabling quick lookup during response handling.
-
-## Error Handling and Validation
-
-### Error Types
-
-**StructuredOutputError** (base class):
-
-- Holds the `AIMessage` that caused the error
-- Parent of specific error types
-
-**MultipleStructuredOutputsError**:
-
-Raised when a single structured output schema is expected but the model calls multiple structured output tools.
-
-```python
-tool_names = [tc["name"] for tc in structured_tool_calls]
-exception = MultipleStructuredOutputsError(tool_names, output)
-```
-
-**StructuredOutputValidationError**:
-
-Raised when tool call arguments fail to parse according to the schema.
-
-```python
-exception = StructuredOutputValidationError(tool_name, source_exception, output)
-```
-
-### Retry Logic (ToolStrategy Only)
-
-When `handle_errors` is enabled and a validation error occurs during tool parsing:
-
-1. `_handle_structured_output_error()` determines if retry should happen
-2. Returns `(should_retry: bool, error_message: str)`
-3. If retry: Error message wrapped in `ToolMessage` appended to conversation
-4. Model receives error context and can correct its response
-
-**Error Callback:**
-
-```python
-should_retry, error_message = _handle_structured_output_error(
-    exception, effective_response_format
-)
-if not should_retry:
-    raise exception from exc
-
-# Return error message to model
-return {
-    "messages": [
-        output,
-        ToolMessage(
-            content=error_message,
-            tool_call_id=tool_call["id"],
-            name=tool_call["name"],
-        ),
-    ],
+schema = {
+    "type": "function",
+    "function": {
+        "name": "Response",
+        "description": "...",
+        "parameters": {
+            "type": "object",
+            "properties": {...},
+            "required": [...]
+        }
+    }
 }
 ```
 
-The model's next turn receives the error and can attempt to correct the output.
+**`convert_to_json_schema(schema, strict=None)`** — Converts schema to JSON Schema format:
+
+```python
+from langchain_core.utils.function_calling import convert_to_json_schema
+
+json_schema = {
+    "type": "object",
+    "properties": {...},
+    "required": [...],
+    "title": "Response"
+}
+```
+
+## Output Parsers
+
+Output parsers transform model responses into structured objects. The parser used depends on the schema type and strategy:
+
+### PydanticToolsParser
+
+Parses tool calls for Pydantic models:
+
+```python
+from langchain_core.output_parsers.openai_tools import PydanticToolsParser
+
+parser = PydanticToolsParser(
+    tools=[MyPydanticModel],
+    first_tool_only=True  # Return only first tool call
+)
+
+# Input: AIMessage with tool_calls
+# Output: MyPydanticModel instance
+parsed = parser.parse_result([generation])
+```
+
+**Behavior:**
+- Extracts tool call arguments from `AIMessage.tool_calls`
+- Validates arguments against Pydantic model schema
+- Raises `OutputParserException` on validation failure
+- Returns first tool call result if `first_tool_only=True`
+
+### JsonOutputKeyToolsParser
+
+Parses tool calls for dict/JSON schema:
+
+```python
+from langchain_core.output_parsers.openai_tools import JsonOutputKeyToolsParser
+
+parser = JsonOutputKeyToolsParser(
+    key_name="MyTool",
+    first_tool_only=True
+)
+
+# Input: AIMessage with tool_calls
+# Output: dict with parsed arguments
+```
+
+### PydanticOutputParser
+
+Parses raw JSON text for Pydantic models:
+
+```python
+from langchain_core.output_parsers.pydantic import PydanticOutputParser
+
+parser = PydanticOutputParser(pydantic_object=MyPydanticModel)
+
+# Input: JSON text
+# Output: MyPydanticModel instance
+parsed = parser.parse(json_text)
+```
+
+### JsonOutputParser
+
+Parses raw JSON text:
+
+```python
+from langchain_core.output_parsers.json import JsonOutputParser
+
+parser = JsonOutputParser(pydantic_object=MyPydanticModel)  # optional
+
+# Input: JSON text
+# Output: dict or MyPydanticModel instance (if pydantic_object specified)
+parsed = parser.parse(json_text)
+```
+
+**Streaming Support:**
+- `parse_result(result, partial=True)` returns partial JSON objects as they stream
+- Useful for progressive rendering of structured output
+
+## Error Handling and Validation
+
+### Output Parser Exceptions
+
+Parsers raise `OutputParserException` when parsing fails:
+
+```python
+from langchain_core.exceptions import OutputParserException
+
+try:
+    parsed = parser.parse(text)
+except OutputParserException as e:
+    print(f"Parsing error: {e}")
+```
+
+Error details include:
+- The parser that failed
+- The input that caused the error
+- The underlying validation error (if applicable)
+
+### Include Raw Pattern for Error Recovery
+
+Using `include_raw=True` allows applications to handle errors gracefully:
+
+```python
+structured_model = model.with_structured_output(
+    MySchema,
+    include_raw=True
+)
+
+result = structured_model.invoke(prompt)
+# result = {
+#     'raw': AIMessage(...),
+#     'parsed': MySchema(...) | None,
+#     'parsing_error': Exception | None
+# }
+
+if result['parsing_error']:
+    print(f"Error: {result['parsing_error']}")
+    # Fall back to raw model response
+    text = result['raw'].content
+else:
+    structured_output = result['parsed']
+```
 
 ### Validation Limitations
 
-**Dict schemas skip validation:** Raw JSON schema dicts (not Pydantic, dataclass, or TypedDict) return arguments as-is:
+**Tool-based strategy (default):**
+- Pydantic/dataclass/TypedDict schemas get full validation
+- Raw JSON schema dicts skip validation (returned as-is from tool arguments)
+- To enable validation, express schemas as Pydantic models or TypedDicts
+
+**Provider-native strategy:**
+- Provider enforces schema at generation time; model output is guaranteed valid JSON
+- Schema validation happens server-side; no retry mechanism on validation failure
+- Strict mode (when supported) guarantees exact schema compliance
+
+## Streaming Structured Output
+
+Structured output can be streamed for progressive parsing, though streaming behavior varies by strategy and parser.
+
+### Partial JSON Parsing
+
+`JsonOutputParser` and `PydanticOutputParser` support partial parsing during streaming:
 
 ```python
-if schema_kind == "json_schema":
-    return data  # No validation, no retry possible
+parser = JsonOutputParser(pydantic_object=MySchema)
+
+# Streaming with partial parsing
+for chunk in parser.stream(text_stream):
+    if chunk:
+        print(f"Partial: {chunk}")
+        # chunk is a partial object with received fields so far
 ```
 
-To enable validation and retries, express schemas as Pydantic models or TypedDicts.
+### Tool Call Streaming
 
-**Provider strategy has no retry:** Native structured output is provider-enforced; the agent receives valid JSON or an API error. No in-conversation retry is possible for schema mismatches.
-
-## State and Lifecycle
-
-### State Fields
-
-The agent state includes structured output handling via:
-
-- **messages**: Includes tool calls and tool messages from structured output invocation
-- **structured_response**: Holds the parsed schema instance (set when output is valid, cleared on error retry or when no structured output is produced)
-
-### Structured Response Clearing
-
-The `_build_commands()` function ensures that `structured_response` field is explicitly cleared when:
-
-1. Agent is configured with `response_format` (has_structured_output = True)
-2. Model invocation did not produce a structured response
-
-This prevents stale values from previous checkpointed turns in persistent agent state. The clearing happens in the state update passed to the graph:
+When using tool-calling strategy, tool arguments stream incrementally:
 
 ```python
-state: dict[str, Any] = {"messages": messages}
-if model_response.structured_response is not None:
-    state["structured_response"] = model_response.structured_response
-elif has_structured_output:
-    state["structured_response"] = None  # Explicitly clear to avoid stale values
+# Stream events from a structured model
+for event in structured_model.stream_events(
+    prompt,
+    version="v3"
+):
+    if event["event"] == "on_parser_stream":
+        print(f"Partial parse: {event['data']}")
 ```
 
-### Lifecycle Events
+### Provider Streaming
 
-```
-User input
-  ↓
-[pre-model middleware]
-  ↓
-_get_bound_model() → detect strategy, bind model with tools or provider format
-  ↓
-model.invoke() → model returns AIMessage with tool_calls (ToolStrategy)
-                 or text (ProviderStrategy)
-  ↓
-_handle_model_output() → parse response, validate against schema
-  ↓
-[structured_response set] or [error + retry message]
-  ↓
-[post-model middleware]
-  ↓
-Return to user or continue loop
-```
-
-## Configuration and Middleware
-
-Raw schemas and strategy decisions are passed to middleware via `ModelRequest.response_format`. Middleware can override `response_format` at invocation time via `ModelRequest.override()`:
+Provider-native implementations may stream JSON incrementally. Streaming behavior depends on the provider's API:
 
 ```python
-class MyMiddleware(AgentMiddleware):
-    def wrap_model_call(self, request, handler):
-        # Narrow union response format to a specific variant
-        narrow_format = ToolStrategy(schema=request.response_format.schema_specs[0])
-        return handler(request.override(response_format=narrow_format))
+# OpenAI JSON Schema API with streaming
+structured_model = model.with_structured_output(
+    MySchema,
+    method="json_schema"
+)
+
+# Model streams JSON as it generates
+for chunk in structured_model.stream(prompt):
+    if chunk:
+        print(f"Streamed output: {chunk}")
 ```
 
-The agent re-detects strategy and rebuilds tool bindings on each invocation, allowing dynamic schema changes. However, **all structured output schemas must be declared upfront**—middleware cannot add new schemas not present in the initial `response_format`.
+## Provider-Specific Implementations
 
-## Example: Weather Agent with Structured Output
+### ChatOpenAI
+
+`ChatOpenAI` provides three methods:
+
+```python
+from langchain_openai import ChatOpenAI
+
+model = ChatOpenAI(model="gpt-4o")
+
+# Method 1: Function calling (default)
+structured_model = model.with_structured_output(
+    MySchema,
+    method="function_calling"  # Default
+)
+
+# Method 2: JSON Schema API (strict enforcement)
+structured_model = model.with_structured_output(
+    MySchema,
+    method="json_schema",
+    strict=True
+)
+
+# Method 3: JSON Mode (user-directed format)
+structured_model = model.with_structured_output(
+    MySchema,
+    method="json_mode"
+    # Note: Must include format instructions in prompt
+)
+```
+
+**Method Selection Logic:**
+- `method="json_schema"`: Supported on GPT-4o and GPT-4 Turbo+ models. Provides strict schema enforcement
+- `method="function_calling"`: Works on all models with tool calling
+- `method="json_mode"`: Works on models with JSON mode support; no schema validation
+
+### Tool-Based Binding for Middleware
+
+Both default and provider implementations set `ls_structured_output_format` metadata for middleware:
+
+```python
+llm = model.bind(...)  # or bind_tools(...)
+# The bound kwargs include:
+# {
+#     "ls_structured_output_format": {
+#         "kwargs": {"method": "..."},
+#         "schema": schema_object
+#     }
+# }
+```
+
+This metadata allows middleware to:
+- Observe structured output usage
+- Transform or validate schemas
+- Change parsing strategy
+- Track schema compliance
+
+## Examples
+
+### Basic Pydantic Schema
 
 ```python
 from pydantic import BaseModel
-from langchain.agents import create_agent
 from langchain_openai import ChatOpenAI
 
 class WeatherResponse(BaseModel):
-    """Current weather forecast."""
+    """Current weather information."""
     location: str
     temperature_f: int
     condition: str
     humidity_percent: int
 
-# Create agent with structured output
-agent = create_agent(
-    model=ChatOpenAI(model="gpt-4o"),
-    response_format=WeatherResponse,  # AutoStrategy
-    system_prompt="You are a weather forecaster. Return accurate weather data.",
-)
+model = ChatOpenAI(model="gpt-4o")
+structured_model = model.with_structured_output(WeatherResponse)
 
-# Invoke
-result = agent.invoke({
-    "messages": [{"role": "user", "content": "What's the weather in San Francisco?"}]
-})
-
-# Access structured response
-weather: WeatherResponse = result["structured_response"]
-print(f"Temperature: {weather.temperature_f}°F, Condition: {weather.condition}")
+result = structured_model.invoke("What's the weather in San Francisco?")
+# result is a WeatherResponse instance
+print(f"Temp: {result.temperature_f}°F, Condition: {result.condition}")
 ```
 
-With explicit error handling:
+### TypedDict Schema
 
 ```python
-from langchain.agents.structured_output import ToolStrategy
+from typing_extensions import TypedDict
+from langchain_openai import ChatOpenAI
 
-agent = create_agent(
-    model="openai:gpt-4o",
-    response_format=ToolStrategy(
-        schema=WeatherResponse,
-        handle_errors=True,  # Retry on validation errors
-        tool_message_content="Invalid weather data format. Please provide: location, temperature_f, condition, humidity_percent.",
-    ),
+class WeatherResponse(TypedDict):
+    """Current weather information."""
+    location: str
+    temperature_f: int
+    condition: str
+
+model = ChatOpenAI(model="gpt-4o")
+structured_model = model.with_structured_output(WeatherResponse)
+
+result = structured_model.invoke("What's the weather in NYC?")
+# result is a dict
+print(result["temperature_f"])
+```
+
+### Include Raw for Error Handling
+
+```python
+from pydantic import BaseModel
+
+class Answer(BaseModel):
+    """Answer with reasoning."""
+    answer: str
+    reasoning: str
+
+model = ChatOpenAI(model="gpt-4o")
+structured_model = model.with_structured_output(Answer, include_raw=True)
+
+result = structured_model.invoke("What is 2+2?")
+# result = {
+#     'raw': AIMessage(...),
+#     'parsed': Answer(...) | None,
+#     'parsing_error': Exception | None
+# }
+
+if result['parsing_error']:
+    # Fallback to raw response
+    raw_text = result['raw'].content
+    print(f"Parsing failed, using raw: {raw_text}")
+else:
+    print(f"Answer: {result['parsed'].answer}")
+    print(f"Reasoning: {result['parsed'].reasoning}")
+```
+
+### JSON Schema Dict
+
+```python
+from langchain_openai import ChatOpenAI
+
+schema = {
+    "type": "object",
+    "properties": {
+        "name": {"type": "string"},
+        "age": {"type": "integer"},
+    },
+    "required": ["name", "age"]
+}
+
+model = ChatOpenAI(model="gpt-4o")
+structured_model = model.with_structured_output(schema)
+
+result = structured_model.invoke("Extract person info from: John Smith, age 28")
+# result is a dict: {"name": "John Smith", "age": 28}
+```
+
+### Streaming Partial Results
+
+```python
+from pydantic import BaseModel
+
+class Response(BaseModel):
+    text: str
+    category: str
+
+model = ChatOpenAI(model="gpt-4o")
+structured_model = model.with_structured_output(Response)
+
+# Stream partial results
+for chunk in structured_model.stream("Generate a response..."):
+    print(f"Chunk: {chunk}")
+```
+
+## Relationship to Related Patterns
+
+### vs. Tool Calling
+
+Structured output constrains the response content directly. Tool calling constrains which tools the model invokes. You can use both together in provider-native APIs:
+
+```python
+# Model can call tools OR return structured response
+structured_model = model.with_structured_output(
+    ResponseSchema,
+    method="json_schema",
+    tools=[search_tool, calculator_tool],  # ChatOpenAI only
+    strict=True,
+    include_raw=True
 )
+
+result = structured_model.invoke(prompt)
+if result['raw'].tool_calls:
+    # Model chose to call a tool
+    pass
+else:
+    # Model returned structured response
+    structured = result['parsed']
+```
+
+### vs. Prompting
+
+Prompting (instructing the model to return JSON) is unreliable:
+
+```python
+# ❌ Unreliable: depends on model following instructions
+prompt = "Return JSON with keys: name, age"
+response = model.invoke(prompt)
+json.loads(response.content)  # May fail; format not enforced
+```
+
+`with_structured_output()` ensures format compliance:
+
+```python
+# ✓ Reliable: format guaranteed by binding strategy
+structured_model = model.with_structured_output(MySchema)
+result = structured_model.invoke(prompt)  # Always MySchema instance or error
 ```
 
 ## See Also
 
-- [Agent Factory](/openwiki/agent-factory.md): Entry point for creating agents; handles schema registration and strategy binding
-- [Agent Execution Flow](/openwiki/agent-execution.md): Runtime loop where structured output is parsed and validated
-- [LangChain Structured Output Documentation](https://python.langchain.com/docs/guides/structured_output/)
+- [Chat Models](/openwiki/chat-models.md): Base model interfaces, binding, tool calling
+- [Runnables](/openwiki/runnables.md): `Runnable` interface, chaining, streaming, async
+- [Tools](/openwiki/tools.md): Tool definitions, tool calling, schemas
+- [LangChain Core Reference](https://python.langchain.com/docs/concepts/structured_output/): Official structured output documentation

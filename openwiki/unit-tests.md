@@ -1,11 +1,11 @@
 ---
 type: "Testing & QA"
-title: "Unit Testing and Mocking"
-description: "Guide to writing unit tests: test structure, mocking chat models, fixtures, assertions, and test coverage for agents and components."
-tags: [unit-tests, pytest, testing, fixtures, mocking, chat-models, tools, agents, integration, assertions]
+title: "Unit Testing: Test Structure and Best Practices"
+description: "Guide to writing unit tests in LangChain: test structure, organization, pytest fixtures, mocking patterns, async testing, snapshot testing, and best practices for agents and components."
+tags: [unit-tests, pytest, testing, fixtures, mocking, async, pytest-asyncio, markers, conftest, agents, components]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-28T08:35:20.640Z
+    at: 2026-10-11T08:26:15.994Z
 sources:
   - id: openwiki-source-8f1875229ad4a704c8e20a06
     resource: repo://libs/core/Makefile
@@ -45,14 +45,14 @@ sources:
     resource: repo://libs/standard-tests/langchain_tests/unit_tests/embeddings.py
   - id: openwiki-source-a6b31954b6df57580d0f3ed0
     resource: repo://libs/standard-tests/langchain_tests/unit_tests/tools.py
-generated: { by: "openwiki/0.5.0", at: "2026-09-28T08:35:20.640Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-10-11T08:26:15.994Z" }
 ---
 
 ## Overview
 
 Unit testing in LangChain covers components in isolation without network calls or external API dependencies. Tests live in `tests/unit_tests/` directories and are run via `make test` or `uv run --group test pytest` with strict socket restrictions and parallelization.
 
-This page covers the test infrastructure, standard test classes for chat models and tools, agent-specific testing patterns (state transitions, middleware behavior, tool calls), fixtures, mocking strategies, callbacks, and assertions for testing agents and components.
+This page covers test infrastructure, standard test classes for chat models and tools, fixtures, mocking strategies, async testing with pytest-asyncio, callbacks, assertions, and best practices for testing agents and components.
 
 ## Test Structure and Organization
 
@@ -94,6 +94,27 @@ make extended_tests
 ```
 
 The Makefile test target sets `--disable-socket --allow-unix-socket` and uses `pytest-xdist` (`-n auto`) for parallel execution. Environment variables for LangSmith tracing (`LANGCHAIN_TRACING_V2`, `LANGSMITH_API_KEY`, etc.) are explicitly unset to keep tests independent.
+
+### Test Configuration
+
+pytest is configured in `pyproject.toml`:
+
+```toml
+[tool.pytest.ini_options]
+addopts = "--snapshot-warn-unused --strict-markers --strict-config --durations=5"
+markers = [
+    "requires: mark tests as requiring a specific library",
+    "compile: mark placeholder test used to compile integration tests without running them",
+]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = ["ignore::langchain_core._api.beta_decorator.LangChainBetaWarning"]
+```
+
+**Key settings**:
+- `asyncio_mode = "auto"`: Automatically detects and runs `async def` test functions without requiring `@pytest.mark.asyncio`
+- `asyncio_default_fixture_loop_scope = "function"`: Creates a new event loop for each test function
+- `--snapshot-warn-unused`: Warns about unused snapshot files
 
 ## Standard Test Classes
 
@@ -247,11 +268,73 @@ class TestMyToolUnit(ToolsUnitTests):
 - Tool schema generation (JSON schema)
 - Initialization from environment variables
 
+## Async Testing with pytest-asyncio
+
+### Automatic Async Test Detection
+
+With `asyncio_mode = "auto"` in `pyproject.toml`, any `async def` test function is automatically detected and run with an event loop, **without requiring `@pytest.mark.asyncio`**:
+
+```python
+# No marker needed - asyncio_mode="auto" handles this
+async def test_async_invoke():
+    model = ChatOpenAI()
+    result = await model.ainvoke("Hello")
+    assert result.content is not None
+```
+
+### Testing Async Streams
+
+Test async streaming with `astream()` and async comprehensions:
+
+```python
+async def test_async_streaming():
+    model = ChatOpenAI()
+    chunks = []
+    async for chunk in model.astream("Hello"):
+        chunks.append(chunk)
+    assert len(chunks) > 0
+```
+
+### Async Context and Event Loop Isolation
+
+With `asyncio_default_fixture_loop_scope = "function"`, each test function gets its own isolated event loop. This prevents state leakage between tests:
+
+```python
+async def test_concurrent_invocations():
+    model = ChatOpenAI()
+    
+    # Multiple concurrent calls in the same test
+    results = await asyncio.gather(
+        model.ainvoke("A"),
+        model.ainvoke("B"),
+        model.ainvoke("C"),
+    )
+    assert len(results) == 3
+```
+
+### Testing Async Callbacks
+
+Verify async callback behavior:
+
+```python
+async def test_async_callbacks():
+    handler = FakeCallbackHandler()
+    model = ChatOpenAI()
+    
+    result = await model.ainvoke(
+        "Hello",
+        config={"callbacks": [handler]}
+    )
+    
+    assert handler.llm_starts == 1
+    assert handler.llm_ends == 1
+```
+
 ## Mocking Chat Models for Agent Testing
 
 ### FakeToolCallingModel
 
-For testing agents and structured workflows without API calls, use `FakeToolCallingModel` from the test utilities:
+For testing agents and structured workflows without API calls, use `FakeToolCallingModel`:
 
 ```python
 from tests.unit_tests.agents.model import FakeToolCallingModel
@@ -314,9 +397,11 @@ The agent's error handling produces a `ToolMessage` with `status="error"` contai
 
 ### conftest.py Patterns
 
-The root `conftest.py` in `tests/unit_tests/` provides shared fixtures and pytest hooks. Agent test suites (like `libs/langchain_v1/tests/unit_tests/agents/conftest.py`) extend these with specialized fixtures.
+The root `conftest.py` in `tests/unit_tests/` provides shared fixtures and pytest hooks. Agent test suites extend these with specialized fixtures.
 
 **From `/libs/core/tests/unit_tests/conftest.py`**:
+
+The `blockbuster` fixture (autouse=True) prevents blocking I/O in async code by registering allowed blocking calls:
 
 ```python
 @pytest.fixture(autouse=True)
@@ -342,6 +427,31 @@ def blockbuster() -> Iterator[BlockBuster]:
         for bb_function in bb.functions.values():
             bb_function.can_block_in("freezegun/api.py", "_get_cached_module_attributes")
         yield bb
+```
+
+**Custom Markers**:
+
+```python
+def pytest_addoption(parser: pytest.Parser) -> None:
+    parser.addoption(
+        "--only-extended",
+        action="store_true",
+        help="Only run extended tests marked with @pytest.mark.requires",
+    )
+    parser.addoption(
+        "--only-core",
+        action="store_true",
+        help="Only run core tests (skip extended tests)",
+    )
+
+def pytest_collection_modifyitems(config: pytest.Config, items) -> None:
+    """Automatically skip tests marked with @pytest.mark.requires if dependencies are missing."""
+    for item in items:
+        requires_marker = item.get_closest_marker("requires")
+        if requires_marker:
+            for pkg in requires_marker.args:
+                if util.find_spec(pkg) is None:
+                    item.add_marker(pytest.mark.skip(reason=f"Requires pkg: {pkg}"))
 ```
 
 ### Agent Test Fixtures
@@ -377,49 +487,6 @@ async def async_checkpointer(request: pytest.FixtureRequest) -> AsyncIterator[Ba
 
 Set `LANGGRAPH_TEST_FAST=true` environment variable to run against only in-memory backends for fast iteration.
 
-**Custom Markers**:
-
-```python
-def pytest_addoption(parser: pytest.Parser) -> None:
-    parser.addoption(
-        "--only-extended",
-        action="store_true",
-        help="Only run extended tests marked with @pytest.mark.requires",
-    )
-    parser.addoption(
-        "--only-core",
-        action="store_true",
-        help="Only run core tests (skip extended tests)",
-    )
-
-def pytest_collection_modifyitems(config: pytest.Config, items) -> None:
-    """Automatically skip tests marked with @pytest.mark.requires if dependencies are missing."""
-    for item in items:
-        requires_marker = item.get_closest_marker("requires")
-        if requires_marker:
-            for pkg in requires_marker.args:
-                if util.find_spec(pkg) is None:
-                    item.add_marker(pytest.mark.skip(reason=f"Requires pkg: {pkg}"))
-```
-
-**Fixture for Deterministic UUIDs**:
-
-```python
-@pytest.fixture
-def deterministic_uuids(mocker):
-    """Replace random UUIDs with deterministic values for snapshot testing."""
-    side_effect = (UUID(f"00000000-0000-4000-8000-{i:012}", version=4) for i in range(10000))
-    return mocker.patch("uuid.uuid4", side_effect=side_effect)
-```
-
-Use the `deterministic_uuids` fixture in tests where UUIDs must be stable across runs:
-
-```python
-def test_runnable_with_trace(deterministic_uuids):
-    # UUIDs will be predictable now
-    ...
-```
-
 ### Marker Patterns
 
 ```python
@@ -450,6 +517,24 @@ def test_new_feature():
 # Expected failure
 @pytest.mark.xfail(reason="Feature not yet implemented")
 def test_future_feature():
+    ...
+```
+
+**Fixture for Deterministic UUIDs**:
+
+```python
+@pytest.fixture
+def deterministic_uuids(mocker):
+    """Replace random UUIDs with deterministic values for snapshot testing."""
+    side_effect = (UUID(f"00000000-0000-4000-8000-{i:012}", version=4) for i in range(10000))
+    return mocker.patch("uuid.uuid4", side_effect=side_effect)
+```
+
+Use the `deterministic_uuids` fixture in tests where UUIDs must be stable across runs:
+
+```python
+def test_runnable_with_trace(deterministic_uuids):
+    # UUIDs will be predictable now
     ...
 ```
 
@@ -791,28 +876,6 @@ def test_callbacks_on_chain():
     assert handler.llm_ends == 1
 ```
 
-### Async Testing
-
-Mark async tests with `async def` and `pytest` handles them:
-
-```python
-import pytest
-
-@pytest.mark.asyncio
-async def test_async_invoke():
-    model = ChatOpenAI()
-    result = await model.ainvoke("Hello")
-    assert result.content is not None
-
-@pytest.mark.asyncio
-async def test_async_streaming():
-    model = ChatOpenAI()
-    chunks = []
-    async for chunk in model.astream("Hello"):
-        chunks.append(chunk)
-    assert len(chunks) > 0
-```
-
 ### Snapshot Testing with Syrupy
 
 Snapshot tests capture output and compare against baseline snapshots. Useful for complex structures, traces, and serialized objects.
@@ -1038,6 +1101,7 @@ make coverage
 - **pydantic_utils.py** (`libs/core/tests/unit_tests/pydantic_utils.py`): Schema normalization for cross-version Pydantic compatibility
 - **fake/callbacks.py** (`libs/core/tests/unit_tests/fake/callbacks.py`): FakeCallbackHandler for tracking events
 - **fake/test_fake_chat_model.py**: Examples of testing fake models
+- **runnables/conftest.py** (`libs/core/tests/unit_tests/runnables/conftest.py`): Disables local LangSmith tracing for runnable tests
 
 ## Best Practices
 
@@ -1068,3 +1132,9 @@ make coverage
 13. **Assert message types and content**: Verify the shape of agent responses, tool calls, and state updates.
 
 14. **Test error recovery**: Verify agents recover from invalid tool calls and other errors gracefully.
+
+15. **Use async patterns correctly**: With `asyncio_mode = "auto"`, write `async def` test functions without manual markers; rely on event loop isolation per function.
+
+16. **Avoid socket access**: Ensure tests pass `--disable-socket` by avoiding unintended network calls; use mocks and fake implementations.
+
+17. **Keep LangSmith tracing disabled**: Unit tests should unset tracing environment variables to remain isolated and fast.

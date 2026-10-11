@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:479c5428fb5c4d5a6a9cb84f2f11bf8a578e6af0b1f5e1208f47fa98d0f563df",
+  "pageVersion": "sha256:b29a2a38eef3cacdb52d44c63f22381363f3dabaf1cd915df83a4b3b3183eb0a",
   "claims": [
     {
       "id": "claim_06ad6af0140b4318b25f43272f89e77f",
@@ -175,10 +175,44 @@
           "version": "repo-lines-v1:sha256:9e7a196791d7921f5dda4aff01828a5731663f7a163f5da719a6140c2fec3dee:eyJzZWxlY3RlZExpbmVDb3VudCI6NTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjdmZGRjYTFjZDMwMjFlNzA0YjcxMjNiMTYwMGIzOGM3ZDExNTRhYWZiNGJlNzEwOTA1ZTVkZDE1MjBlNzk0NTMiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU5MjU2OTVlYTJkY2RhMWM2M2JlMjg1Yjc4MDlhMmEwMzYwZGEzZGZiYWY3ZjMzYjJkMTA0NzJmYzZhMDNkMDEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjowLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjgxZjAyMzJlOTNkNTcxMDA4MTM4N2E5ZWFkNmFjZmRlZTYzNGRkZWU3YzQ2ZjE0NDc3Y2NhZGRhMDZmZWE5OTIifQ"
         }
       ]
+    },
+    {
+      "id": "claim_d3744abbca4b4575a2d09efb585189a6",
+      "statement": "BasePromptTemplate defines the core interface for all prompt templates, with properties for input_variables, optional_variables, partial_variables, output_parser, metadata, and tags. Variable names are auto-extracted from templates and validated; the 'stop' variable name is reserved, and overlapping input and partial variables raise validation errors.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/prompts/base.py#L38-L106",
+          "version": "repo-lines-v1:sha256:cb21cabaf35887c5a33bcc003d55152713d0ef71220e67ce5760c82164483d60:eyJzZWxlY3RlZExpbmVDb3VudCI6NjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE4N2Y5MjEyNjY1ODMyZTQ2ZGY0M2RkYzA3MGI4NmJkYzU1ZjZiZDJhN2E4ZmEyMTQ4NjU2MTExMjMzODk1MWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImEyYWIwOTBiY2QxNjIwZmE2MmVhZWUxNTdhNzRmY2E2MzVhYTI5ZTEyY2JmZmQ2MThiNTc5MmQ4N2JjMDNhM2YiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjkyNmZhZGQ5YWM2YzQzMDJjZWNlMjkxMWNiM2VhMzkzMDcwYzBjZmI1MTZhMTk2NzMxMjllOWUwYjE0MTVjMmMiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxM2QxNTY1OGFlNGYxMWMwYWE4Mzc1NWM2MDM0ZmI2MWZhMWY1OWFmMjRlNTYwOWI4NTc0MjJmOGQ3YTQyOTcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_5c1381b4cee84f7f97c3d840381d6cfb",
+      "statement": "Prompt templates return PromptValue instances, abstract base class types that convert between string (for LLMs) and message list (for chat models) forms. StringPromptValue wraps a single string and converts to HumanMessage; ChatPromptValue wraps a list of BaseMessage objects.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/prompt_values.py#L24-L105",
+          "version": "repo-lines-v1:sha256:abe75a7764c81f1187a26f7fd65c2010f03d4c6efa620208dc44f8aa6cc51a63:eyJzZWxlY3RlZExpbmVDb3VudCI6ODIsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjFiMGIxMDllMjZkNzcxNzAwOWFhNjJhMjM5YTBiNzhjMmIyNTAwODhlN2FiYjIzNzM3NmQwOWIxY2Q2Y2NkMzciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImE5OGIwNjNkOWI0N2U2NTM3OTYyNTU3MmNjZTE5NzY2OWQ1NzY3ZTEyYzE4YmUwNzU2NTJiOGNkOTgxY2U4ZDUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjU5NjU2NGExNmRmM2EyNDU2YWZlMTcwMTQ5YzBkYjIxMjhhYTc2YjUyMzU5ZDAzZjJkODA0MmI3NGYwZDM2ZDYifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_30ab25ecc4874f88a01d814ba801c931",
+      "statement": "Partial variables pre-fill template slots during construction, reducing required inputs and enabling lazy evaluation. The partial() method returns new immutable instances; runtime values override partial defaults. Optional MessagesPlaceholder variables are pre-populated with empty list defaults.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/langchain_core/prompts/base.py#L67-L72",
+          "version": "repo-lines-v1:sha256:fab1c8777a008cb64f2a4a121a2b07880cc9622cf7c6c9794e34bf348551b8d1:eyJzZWxlY3RlZExpbmVDb3VudCI6NiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiODdmMGQwOGEzZDgwM2UwNDMyOGU5MzdhNjdkMjRjNDU0M2I1ZjM2MTRhMDg1YWQ5NjFiNGU3MjAxNWNjMzFjMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTZhNzE1MjU3MmVlODRmMTA5MDZjNzRiOWYyYTkyNDM0ZGRhYjBlM2M0MjgxM2IwNGU1OTdlZmNlYzk1MWIyNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMzBmNzcxZTdlNDcyNWU0Zjc0OTJhZDM5OWFlOGEyOGQ3Zjg4ZjhkZjk0NmVjNTc2OWVhM2IwNjI1NTdhYWQ3NSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZmYyMThjYWM1ZDk1MWI1YWQ5YWEyM2IxOTg5OTUyYTJiYjYxZTIzOWM2NzY5YzEzYzRlZjc2OGI2MDFiZjIyNiJ9"
+        },
+        {
+          "resource": "repo://libs/core/langchain_core/prompts/chat.py#L976-L1000",
+          "version": "repo-lines-v1:sha256:168085569c14a45d80a95c2e91f03e1456f5a77c51bc6d39496734aa3e1ba7e6:eyJzZWxlY3RlZExpbmVDb3VudCI6MjUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImRlNmQ5NTA2NmRlNGZhMzAwMDQ3ZjUwNjU3ZjhmZGJmNzEyYTNkZWMyNzkzODg1Mjg3ZjRiNWRmY2FkZTRjN2EiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImI2NDkwMTIxYmYxZDY5Y2MxMjAxNzBkZTQ2MzFkMmYwYTVhMWE3MjhkMTVhMTgwNTQ3MzVlM2M1ZjNkMThmNzgiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRkOGZmMzFkZWNkZjY5ZTFkZDkyZDVmYjNhOTM0YWQwNzYxMmViYjM0ZDM4MDEzNzMyZDM2OWVlMDIzYzI2YzciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImIxM2QxNTY1OGFlNGYxMWMwYWE4Mzc1NWM2MDM0ZmI2MWZhMWY1OWFmMjRlNTYwOWI4NTc0MjJmOGQ3YTQyOTcifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-28T08:35:20.640Z"
+    "at": "2026-10-11T08:26:15.994Z"
   }
 }

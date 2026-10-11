@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:0ec51ab0fa47477f5eb49c0577be6cd4558b283f0a678cd572dc0f65f65db57a",
+  "pageVersion": "sha256:9a64b8b3cf98323b5979f648e63d99a1ae1eb0cd2e9c41f51ce8dd78f86466c4",
   "claims": [
     {
       "id": "claim_42b2b3c1ac6e4a938efa7b2651c79b81",
@@ -173,10 +173,114 @@
           "version": "repo-lines-v1:sha256:c0433ebed594f01b0643c125280438a8183bd59aed0a94fdd5e84113fbccc255:eyJzZWxlY3RlZExpbmVDb3VudCI6MzUsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjMyYTMxYjRjNTM4MzU0MjU1YWM5ZDllODJmMzgyYzg4YzAzYTQ1ZjZiNTg4MGJjNjQ3NTNlZTUyMmVmN2MxNDciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImIyZTNjZGE3ODE1MTM2MDE1MmI4YWM1ZWEwYTdkNmU1NWJkNzQxYjM1YWU1YWE3ZGVjMzU5M2ZmOTlmNzY4N2QiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijc0ZWJhYzU1OWIxOGIxZWE4ZTkxZWUzMGM3YmE0ZWMxMGY4YTU5OGQ5NDNkYThmZDI1NDRkMzJlNGZlZWYwMDIiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImVjYTkyZmFmYjU5MjhjZDgyOTUzZGU5OTNkMjBjNTIxZGMxYjdmNjhmN2E1ZTE2ZWRiOGFlZmFiZGJhMGYwMGIifQ"
         }
       ]
+    },
+    {
+      "id": "claim_9d64b32f0fac4c9393fcd0159dbe410b",
+      "statement": "Tests use pytest-xdist for parallel execution with -n auto flag. Parallelization can be controlled via PYTEST_EXTRA environment variable, with -n0 for serial execution and -n<N> for specific worker counts.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/Makefile#L20-L20",
+          "version": "repo-lines-v1:sha256:a7fbd80411acecdd918b88984171870f95e8f17a6b404be8064ba76ba6764977:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYTdmYmQ4MDQxMWFjZWNkZDkxOGI4ODk4NDE3MTg3MGY5NWU4ZjE3YTZiNDA0YmU4MDY0YmE3NmJhNjc2NDk3NyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTdmYmQ4MDQxMWFjZWNkZDkxOGI4ODk4NDE3MTg3MGY5NWU4ZjE3YTZiNDA0YmU4MDY0YmE3NmJhNjc2NDk3NyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDhhN2M2ZTg2ZDY0MzYxMjdjODdmOWYxNzhjMDllMTE3YmE5NmEwMzVlMmEzNTRkZGJkN2ViMDkzM2RkOTg3NyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNzgzNzQ1ZTU1YTIzYmI0MzZjYTUxMGFiMTgwNGQyODMwMjhhNTJlNzc5MjE5YmNlNzAyODRkOWY3YjEwMDcxMCJ9"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/Makefile#L41-L41",
+          "version": "repo-lines-v1:sha256:c8d1af332522dbcca683179e87ff0a2450a7efc3f0104af7136a7b4f43452515:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYzhkMWFmMzMyNTIyZGJjY2E2ODMxNzllODdmZjBhMjQ1MGE3ZWZjM2YwMTA0YWY3MTM2YTdiNGY0MzQ1MjUxNSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYzhkMWFmMzMyNTIyZGJjY2E2ODMxNzllODdmZjBhMjQ1MGE3ZWZjM2YwMTA0YWY3MTM2YTdiNGY0MzQ1MjUxNSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNmY2YWIzZjAwMjQ5NjgwZTIzNjA1ZmYwNDBkYTM1NWJhMTQ1MjE2ZmU1MDM0MWM3ZDgzZjc2ZWQwNzE5Y2MwOSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiMDM1ZDRlZGNmNWMxMjllMzBlZGI2M2JhMTczZjNjODIzMjUwMjBiYjYwMThhY2ZlY2I2MzgxN2YwOTA4NmJmNyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_5e53ce7276d547208f3d60fa16948c05",
+      "statement": "Pytest supports test filtering via -k pattern matching, @pytest.mark decorators (including @pytest.mark.extended for extended_tests), and direct class/method specification. Extended tests are run via make extended_tests.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/Makefile#L40-L41",
+          "version": "repo-lines-v1:sha256:abf33a28c25fe94e5754df78a2bc0cd1be4ece5c639c2b0664f4489b6a55ee99:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmFiZjAxNTVlN2VlM2MyNjUyYzE3OTNhMzc2ZTlhMzhmYzJiYzc5NmJjOGM3YzE3NzYwNGQxNjg3N2I1YTIxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNjY1MDc3ZjhmNWMzYTMwNDI1Zjk3MmQwZTFiM2E0ZDg2YzhkZjMwNTllY2ZkN2JlZmU5NTVjMTg1NzZiY2E0MSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNjQwN2NhNzY3YjgzMjJmM2U1ZGEwZDFhM2JkZTY0NzVkNGEzNmI5N2QxNTNmMjU0NTczODc1MWViMTA4ZmU2OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYzI5MzQ5MTMzYjljNWMwMGIwOTgzZTQ0MTdkZjM5OGZmMjViYzQ1ZDU4N2M0NDhlYTBkMGJmYmY0NDA1NWU0OSJ9"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/Makefile#L52-L56",
+          "version": "repo-lines-v1:sha256:ac1955ce90ab15900416f23b218cbbc8a5b9df907d048d9ca5a3c26106acd906:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMmFiZjAxNTVlN2VlM2MyNjUyYzE3OTNhMzc2ZTlhMzhmYzJiYzc5NmJjOGM3YzE3NzYwNGQxNjg3N2I1YTIxMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYjJlM2NkYTc4MTUxMzYwMTUyYjhhYzVlYTBhN2Q2ZTU1YmQ3NDFiMzVhZTVhYTdkZWMzNTkzZmY5OWY3Njg3ZCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiNTIwMmQ1ZTZlMGY0OTA4MzhjMjcyMmFiZWM4YjBkZDI1Yzc4ZGIwODhjMDdkMGVkMDJmMTcyOTUxNmMyZjQ0NCIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNjViODc4NWJjNDEyYzBmYzA5ZTFlOGVmMjc1OGNkNDlkMzNiNWRiZTFiM2M5OTI3NDhkOTg0MDcxNmU2Yjg3NSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_2cbedefd0f284d788bb797f6aa3f0d18",
+      "statement": "Ruff linting rules are configured in pyproject.toml with select=['ALL'] to enable all rules, ignore lists for rule exceptions, and per-file-ignores for test/script exclusions. Docstring convention is enforced as Google-style via [tool.ruff.lint.pydocstyle].",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/pyproject.toml#L99-L138",
+          "version": "repo-lines-v1:sha256:2d24a724c122f4ab2daf2640249d0b79e748922a838bc55c49c03865bd3c2ad6:eyJzZWxlY3RlZExpbmVDb3VudCI6NDAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjZjYzQ0ZGIyNTE3Njc2ZGI2NDFhNmY5Nzc5YTUzNjAyY2M5Y2RjYzQ0MDQ5YTk1MWI1MDI1ZGNjNWMzYjFlNjciLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE5YzZiMTlmNDAxNjQ2ODk0ODJkNjAxN2U1OTVlZDlmYTY0ODAyODExNjIxMTI5OTE2NzcyZjg1YjlhYTI2OTIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImI3MmFkMTkxODYwNGNiZGYyNjA1MjQzYmQwMjk1MjZhYzQ3NTI3NTRiOGFlNDNhMWE5MjZlYTRhODFiYmI1MDYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjkyMjRiNzIxZjZhYjA0ZjcyOWU4NjAwOTUwOWQ0MTRjNzI1MGZkOTBiY2MwZDUxM2M0ZGUxMzA0YTVkOGM0YTAifQ"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/pyproject.toml#L107-L174",
+          "version": "repo-lines-v1:sha256:f85d3ec949cd8607cb88fbcb19f5a1de58759cdafe45c956a255a70ddaa9afe2:eyJzZWxlY3RlZExpbmVDb3VudCI6NjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijc3NDVmYWI4NmIxMjFkYzg1YjRmNzg2NzMzOWExM2ZlZTgwNGM4YTAyZjQ3MTA2NTcyZjJiZjA2NjRkNTk1MWQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImY5NDE2ZTA5Zjc4YmEzMTZjMDMyNTY4MjEzYjg1NWVlNzU2ZTQxNTY1ZDkxOGYwOTUxOWM4MWZkNjIwZjQwNjAiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjMzOGNjM2UyNGQ4NzRmMWU2YTYyMThhYjg4NzE1N2NhNDY0M2IwZjY2YjE2MWIwZmVkNzg3OGQ4ZTI2MDQ1ZTAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImRiZjk3YjdiYjA1MGNmYWUyODAzYWFhOTFmNzhhOTJmZTAyYTRkNmZiZjMyYjI1MmE2ODFhMzFhMWE2MDU5NTMifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_a0b0df9168d742ce9aba641109285568",
+      "statement": "Mypy is configured in pyproject.toml with strict=true, deprecated error code enabled, and warn_unreachable=true. Pydantic plugin is enabled. Per-package overrides suppress missing imports for specific modules.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/pyproject.toml#L90-L94",
+          "version": "repo-lines-v1:sha256:271d9910fae010221a6640973e905afbc6cd05f30e683a58a3ae17f0c972b0aa:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmI3NDVlZWZhNmQ2ZmYzYjYzZjY3MzFkZTI2ZTY4M2MxYzM1MmEwY2Y1YTM0MDUxN2IwMmFkZTg3ZjUxNGQwMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNDVhYWYzNDAyOGUzZmI4Zjg3Njg1YjNjN2RhMzQ4ZDM4ODE4ZDkwMDZmNjdiNWNlYjQ4M2RiN2U0MGM0ODQyNiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiZTY1MDk2NTFiYjAzNzgyNzBhNzQ0NTg1YmIyZmU0M2M3NzBhMzFlZmExMzU2ODg2MjYyOGI3NTYwNjI3YzE3YiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGJkZjFiYTczMzlmOGY4YmNhMDFkOGM0N2Q3NDg3MTk3NjdmYTk0NGE2MjAxYzcwZDcyZDI5ZjlkZDFlOWEyMSJ9"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/pyproject.toml#L110-L118",
+          "version": "repo-lines-v1:sha256:50396128e3a49cbc1a32f61032aea308c9bfd91e425867dc37a3921da28ce45d:eyJzZWxlY3RlZExpbmVDb3VudCI6OSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiYmI3NDVlZWZhNmQ2ZmYzYjYzZjY3MzFkZTI2ZTY4M2MxYzM1MmEwY2Y1YTM0MDUxN2IwMmFkZTg3ZjUxNGQwMyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDBiMGY1ZWNlMzhlZjk3MDRkMzlhNTBjM2ViMmY3NjA1NTYzNGFkYjE5YjgwY2IzYzFjYjQzZjJlNTgxNjMwNCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMmRjODZlZDA2YjAwNmI3YTkyYmZkZTY0Y2M5OGI3YTkwNmFkMzM0Y2UwZjNhYzU0NjIzYjM3ZTNiMDc3MWU0OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNGJkZjFiYTczMzlmOGY4YmNhMDFkOGM0N2Q3NDg3MTk3NjdmYTk0NGE2MjAxYzcwZDcyZDI5ZjlkZDFlOWEyMSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_fb7f59c024754d28a7d6a41a5af48cca",
+      "statement": "make lint_diff and make format_diff target only files changed relative to master branch using git diff output with .py and .ipynb filters, enabling incremental linting during development.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/Makefile#L52-L54",
+          "version": "repo-lines-v1:sha256:081b9ba43777fea6ab89f7d48c9c8ffaa7799e7909a58e76ebe43b8a69889cea:eyJzZWxlY3RlZExpbmVDb3VudCI6MywiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMTFlMmRhNGVlOWZkYzBhY2FlMGRlMmFmY2VlNzlhYTNjY2Y2MDVmMmU0ZWJlYjdjYzRhZTI1MTZlOGI4ZWMzYyIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiOTk2ZDllNWI5ZmU3Y2FjNjg1NDc3YjliMjkyNWVjNzY2MjI2MDQ5ZDVkMzM4ZWQ2NTc0NDdlMjJiMTAxMTY4ZiIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODZlNmIxZjQzNTJkYjdlMDRlYzAwMTQ1MjM1ODc5NzMzYWZiYmMyZDNlNzVjZjdkMzQxODdlNmNiYzAxZjBmYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZDAwOGZjNmFjZmJlMTQ0NDdiMjQ0MzI4MzUwNjgwYTI5OGQ1ZDVhZjUxYjI1NzRkNzExOTgwZGU3OWZkMDkwNiJ9"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/Makefile#L87-L87",
+          "version": "repo-lines-v1:sha256:2275d88df48dff7ae0483a0154231cc567ced7c1aa0b4501c43dd39419c1dd59:eyJzZWxlY3RlZExpbmVDb3VudCI6MSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiMjI3NWQ4OGRmNDhkZmY3YWUwNDgzYTAxNTQyMzFjYzU2N2NlZDdjMWFhMGI0NTAxYzQzZGQzOTQxOWMxZGQ1OSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMjI3NWQ4OGRmNDhkZmY3YWUwNDgzYTAxNTQyMzFjYzU2N2NlZDdjMWFhMGI0NTAxYzQzZGQzOTQxOWMxZGQ1OSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODZlNmIxZjQzNTJkYjdlMDRlYzAwMTQ1MjM1ODc5NzMzYWZiYmMyZDNlNzVjZjdkMzQxODdlNmNiYzAxZjBmYiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiYjlhYzcwNmFmOTE4OWE0M2Y2ZDA0ODdjNzdjM2Q2YmY1ODUyYjc0ZGRmMGExYzMyYmZlMjM2ZjUzYmJlNGNhNCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_c0c79386acdb4b249c6b8ef49c505284",
+      "statement": "Debugging is supported via pdb.set_trace() with pytest -s flag to disable output capture, --pdb flag for post-mortem debugging on failure, -vv for verbose output, -x for exit-on-first-failure, and -l for local variable display in tracebacks.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/Makefile#L31-L32",
+          "version": "repo-lines-v1:sha256:c62bc32c39680aa1dc8e1ac006a6f106a68970a181db46f814d8aee9ffabe3dd:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTNlNzlmN2VmNThlZTZjZjhmN2FjYTFkNGNhMDUxZWE0MmM2MDViZDI0NWNhY2U4NjUxODU3NDE5MDY0MTM4ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGJjM2I0MGUwMjdkYWI2ZDBhNDVmMzcyMDNkZWIxNThiOTQzNjE5OTgyYzhjNjg3MDQ1ZDY2NjQ0M2M1NDY5NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDRiNjYxNTg4ZWZjMjg0YjFkM2IyOGEwOWY0ZGVjNzRkNDA1MTEyMThlMGM5NjAzZWU3ZDU4MzE2Mzk5NWJlYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTc2MWM0ZDFmODdiN2UwN2M4N2NlYmUxM2M5ZTZjZjBlMjcwY2NiMTQ2ZmZmMDlmM2MyMGJkZmM2Njg4YjlkNyJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_655a5cffb3aa4970b4078360b70b41a7",
+      "statement": "Profiling support includes make test_profile (core: speedscope-format), make benchmark (langchain_v1), and --codspeed flag for coverage-guided profiling. Performance bottlenecks are identified via --durations flag.",
+      "evidence": [
+        {
+          "resource": "repo://libs/core/Makefile#L31-L32",
+          "version": "repo-lines-v1:sha256:c62bc32c39680aa1dc8e1ac006a6f106a68970a181db46f814d8aee9ffabe3dd:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTNlNzlmN2VmNThlZTZjZjhmN2FjYTFkNGNhMDUxZWE0MmM2MDViZDI0NWNhY2U4NjUxODU3NDE5MDY0MTM4ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMGJjM2I0MGUwMjdkYWI2ZDBhNDVmMzcyMDNkZWIxNThiOTQzNjE5OTgyYzhjNjg3MDQ1ZDY2NjQ0M2M1NDY5NCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDRiNjYxNTg4ZWZjMjg0YjFkM2IyOGEwOWY0ZGVjNzRkNDA1MTEyMThlMGM5NjAzZWU3ZDU4MzE2Mzk5NWJlYSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiZTc2MWM0ZDFmODdiN2UwN2M4N2NlYmUxM2M5ZTZjZjBlMjcwY2NiMTQ2ZmZmMDlmM2MyMGJkZmM2Njg4YjlkNyJ9"
+        },
+        {
+          "resource": "repo://libs/langchain_v1/Makefile#L49-L50",
+          "version": "repo-lines-v1:sha256:e4467305177de38b36f28ed74ed1b314f8597bc523139ec2aa8a5636ca404729:eyJzZWxlY3RlZExpbmVDb3VudCI6MiwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiNzk3YWI1ZjlkMmRmMTNiYTMxYTI0N2NiYmQzNDVjNzJjOTAwNDNlZGQ5MTM0Mzc5NDkwZWEzZGRlZDkxOGJjYSIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiYTdlMGFhNzlkMmI5OTJkYzUxNDI4OWUzZDQ0YjIxN2YwMTlmYzI0YzVkYWIzZTgyOGRjZmVmNGZiMjJiYzYyMyIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiYjk0MzMxOWM0YmY2ZjY1MDk5MjNmOGEwOGM4YzMwOTA2YWEwN2Y5ZjRjMzFiZmFiMDM3MWM4Mzk5YTIwYTY3MiIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiM2E3MjQyYzk0ZDQ1MzU0NTgwZWZlYjk2M2E0NGY4YWMyYzdiZTI3ZmE1OWU2MTlmZjgyMDA2YzQ3M2YwYzdhOCJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_5b9598ca863446329f26c73e28bf1bd0",
+      "statement": "langchain_v1 supports LANGGRAPH_TEST_FAST environment variable: when set to 1, uses in-memory services instead of Docker; when set to 0, uses full Docker-based services. test_fast target automatically sets LANGGRAPH_TEST_FAST=1.",
+      "evidence": [
+        {
+          "resource": "repo://libs/langchain_v1/Makefile#L40-L47",
+          "version": "repo-lines-v1:sha256:433e647deb5a4fcc117aff518a5f9bd8783da167fab0bd6ff548a3b706bb2328:eyJzZWxlY3RlZExpbmVDb3VudCI6OCwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiZDAwN2I1MTE4ODQ1MWRiMzc5M2FlMjRlYTE3OTQ4NTgzNjcyZWM1NTE0MmFmYWI5NWYzMTQxM2RmMTFkNWI5ZiIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiMDRmNjI1NzYwNGQ3YzFjZTkwZjMzYzkzNzE5NWE2MGJmMzAxNmExZGIwZTViM2U0NWM5Y2UzMzU0MWFkM2IyOSIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiODA2YjQ0OGUzY2QwN2QwNmQ1NTYzNmY0MDA1OTMwMDkxNTJlNzQ2ZTg4ZGYyYzFkYjMzZWUzZmI1ZDgyNmM4OSIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiODI3ZGFmZWU2YzkzN2MwZTM5NDE3YzE1Nzc5NjczMDEzZWYwNTJkNzFhYjNmNmViYTAxNTgzZTdmODAwN2Y3MSJ9"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.5.0",
-    "at": "2026-09-28T08:35:20.640Z"
+    "at": "2026-10-11T08:26:15.994Z"
   }
 }

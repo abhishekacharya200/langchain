@@ -1,11 +1,11 @@
 ---
 type: "Testing & QA"
-title: "Integration Testing: Live API Tests and VCR Cassettes"
-description: "How to write integration tests that call real model APIs with VCR cassette recording for CI compatibility, including environment setup, cassette management, and parameterization patterns."
-tags: [integration-tests, vcr, cassettes, api-testing, pytest, ci-cd, model-testing]
+title: "Integration Testing: Provider and API Testing"
+description: "Integration test structure across provider packages: testing real APIs with VCR cassettes, credential management, test organization, CI/CD workflows, and standard test suite inheritance for partner libraries."
+tags: [integration-tests, vcr, cassettes, api-testing, pytest, ci-cd, provider-testing, credentials, test-markers]
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-28T08:35:20.640Z
+    at: 2026-10-11T08:26:15.994Z
 sources:
   - id: openwiki-source-ff76574b014ac8b5c67560a6
     resource: repo://libs/langchain_v1/tests/integration_tests/chat_models/test_base.py
@@ -29,53 +29,105 @@ sources:
     resource: repo://libs/partners/openai/tests/integration_tests/embeddings/test_base.py
   - id: openwiki-source-db02c1dda8563ab005cd9d62
     resource: repo://libs/standard-tests/langchain_tests/conftest.py
-generated: { by: "openwiki/0.5.0", at: "2026-09-28T08:35:20.640Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-10-11T08:26:15.994Z" }
 ---
 
 ## Overview
 
 Integration tests in LangChain differ fundamentally from unit tests: they call real model APIs (OpenAI, Anthropic, etc.) and require network access and valid credentials. To make these tests reproducible and CI-friendly without exposing API keys or relying on external services, LangChain uses **VCR cassettes**—recorded HTTP interactions that are replayed during test execution.
 
-This page covers the full lifecycle of integration testing: setting up environments, understanding the VCR pattern, organizing cassettes, writing tests that work with both live and recorded modes, handling parameterization, and managing cassette refresh workflows.
+Integration tests are organized separately from unit tests in `tests/integration_tests/` across all packages. They support multiple execution modes: live API calls with credentials (in scheduled CI), cassette-backed playback (in PR checks and local development), and compilation validation. Partner packages inherit a standard test suite from `langchain_tests`, ensuring consistent coverage across all model providers.
+
+This page covers the full lifecycle of integration testing: setting up environments, understanding the VCR pattern, organizing test suites, writing tests that work with both live and recorded modes, managing credentials, understanding CI/CD integration, and leveraging provider-agnostic standard tests.
+
+## Test Organization and Markers
+
+Integration tests are collected and run separately from unit tests, enabling different execution strategies. Three pytest markers distinguish test types:
+
+**`@pytest.mark.vcr`**: Cassette-backed tests that replay recorded HTTP interactions. VCR intercepts all HTTP calls and returns pre-recorded responses. No API key needed; tests are fast and deterministic. Cassettes are committed to git, so these tests pass in CI and local development without credentials.
+
+```python
+@pytest.mark.vcr
+def test_chat_openai_invoke():
+    """Test basic invoke with cassette playback."""
+    chat = ChatOpenAI(model="gpt-4o-mini")
+    response = chat.invoke([HumanMessage(content="Hello")])
+    assert response.content
+```
+
+**`@pytest.mark.scheduled`**: Live API tests that make real calls to external services. These run only in scheduled CI workflows (daily, nightly) or manual on-demand runs with live credentials injected. They are skipped in PR checks unless explicitly selected. Locally, they require a valid API key in `.env`.
+
+```python
+@pytest.mark.scheduled
+def test_chat_openai_streaming_live():
+    """Test streaming with real API calls."""
+    chat = ChatOpenAI(model="gpt-4o-mini")
+    response = chat.invoke("Hello world")
+    assert response.content
+```
+
+**No marker**: Offline tests that don't require API access or cassettes. Used for validation, initialization, or offline scenarios. These run as part of the standard test suite.
+
+```python
+def test_chat_openai_model_name():
+    """Test model name is set correctly."""
+    chat = ChatOpenAI(model="gpt-4o-mini")
+    assert chat.model_name == "gpt-4o-mini"
+```
+
+## Test Location and Structure
+
+Integration tests live in `tests/integration_tests/`, mirroring the layout of unit tests:
+
+```
+libs/partners/openai/tests/
+  unit_tests/
+  integration_tests/
+    chat_models/
+      __init__.py
+      conftest.py
+      test_base.py
+      test_base_standard.py
+      cassettes/
+        test_base/
+          test_invoke.yaml.gz
+          test_invoke[gpt-4o].yaml.gz
+    embeddings/
+      conftest.py
+      test_base.py
+      cassettes/
+```
+
+Each directory may have its own `conftest.py` to configure VCR for that module or override scrubbing behavior. Cassettes are stored in a `cassettes/` subdirectory relative to the test module.
 
 ## Environment Setup: API Keys and .env
 
-Integration tests require valid API credentials to record cassettes (once) and for running live integration tests in scheduled or on-demand scenarios. Store credentials in a `.env` file at the integration test directory root.
+Integration tests require valid API credentials to record cassettes (once, by developers) and for running live integration tests in scheduled or on-demand CI scenarios. Store credentials in a `.env` file at the package test root.
 
 ### .env File Location and Format
 
-For most packages (e.g., OpenAI partner), the structure is:
+For most packages, the structure is:
 
 ```
 libs/partners/openai/tests/.env
 ```
 
-Example `.env.example` (visible in repo):
+Example `.env` file (populated from `.env.example`):
 
 ```bash
-# openai
-# your api key from https://platform.openai.com/account/api-keys
-OPENAI_API_KEY=your_openai_api_key_here
+# OpenAI API key from https://platform.openai.com/account/api-keys
+OPENAI_API_KEY=sk-...
 
-# searchapi
-SEARCHAPI_API_KEY=your_searchapi_api_key_here
+# Other provider keys (if testing multiple providers)
+ANTHROPIC_API_KEY=sk-ant-...
+GROQ_API_KEY=gsk-...
 ```
 
-**Important**: `.env` files are `.gitignore`d and never committed. Copy `.env.example` to `.env` locally and populate with valid keys.
+**Important**: `.env` files are `.gitignore`d and never committed. Each developer or CI environment creates their own `.env` by copying `.env.example` and populating with valid keys.
 
-### Automatic Skipping When Keys Are Missing
+### Automatic Environment Loading
 
-Integration tests don't explicitly skip when API keys are absent. Instead:
-
-1. Tests marked `@pytest.mark.scheduled` (for live API calls) run **only** in scheduled CI or when explicitly selected
-2. Tests marked `@pytest.mark.vcr` (for cassette playback) run in CI via `make test_vcr` without credentials
-3. Tests without markers but that consume API keys will fail at runtime if no `.env` is present—this is intentional for development environments
-
-When running `make integration_tests` locally, you must have a valid `OPENAI_API_KEY` in `.env`. If you don't, the test will error, alerting you that credentials are needed.
-
-### Environment Loading
-
-The test conftest automatically loads `.env` on import:
+The test conftest automatically loads `.env` on import via `python-dotenv`:
 
 ```python
 from pathlib import Path
@@ -91,23 +143,32 @@ def _load_env() -> None:
 _load_env()
 ```
 
-Credentials are then accessed via `os.environ["OPENAI_API_KEY"]` or similar in tests.
+Credentials are then accessed via `os.environ["OPENAI_API_KEY"]` or similar in tests. If a test requires a credential and the `.env` file is missing, the test will fail at runtime when it attempts to instantiate the provider—this is intentional and alerts developers that they need to set up credentials.
 
 ## The VCR Pattern: Recording and Playback
 
-**VCR** (Video Cassette Recorder, implemented by the `vcrpy` library) records HTTP interactions—requests and responses—the first time a test runs with a live API. On subsequent runs, VCR replays the recorded cassette instead of making live network calls.
+**VCR** (Video Cassette Recorder, implemented by the `vcrpy` library) records HTTP interactions—requests and responses—the first time a test runs with a live API. On subsequent runs, VCR replays the recorded cassette instead of making live network calls, enabling fast deterministic testing without credentials.
 
-### Recording Phase (Once, by Developers)
+### Recording Phase: Once by Developers
 
 When a new integration test is written or an existing test's behavior changes:
 
 1. Run the test with `--record-mode=new_episodes` (or the default `once`) and a valid API key in `.env`
 2. VCR intercepts all HTTP calls your test makes
-3. **Before recording**, sensitive headers and tokens in request/response bodies are **scrubbed** (redacted to `PLACEHOLDER` or `**REDACTED**`)
-4. The cassette is saved as a YAML file (optionally compressed as `.yaml.gz`)
-5. The cassette is committed to the repository
+3. **Before recording**, sensitive headers and tokens in request/response bodies are **scrubbed** (redacted)
+4. The cassette is saved as a compressed YAML file (`.yaml.gz`)
+5. The cassette is committed to the repository so others can run tests without API access
 
-### Playback Phase (Always, in CI and Local Development)
+Example:
+
+```bash
+cd libs/partners/openai
+uv run --group test --group test_integration pytest \
+  --record-mode=new_episodes \
+  tests/integration_tests/chat_models/test_base.py::test_chat_openai_invoke
+```
+
+### Playback Phase: Always in CI and Local Development
 
 When running tests:
 
@@ -116,30 +177,16 @@ When running tests:
 3. No API key is needed; no credentials are exposed
 4. Tests are fast (no network latency) and deterministic (same response every time)
 
-### Cassette Location
+Cassettes are replayed via:
 
-Cassettes are stored relative to test modules in a `cassettes/` subdirectory:
-
-```
-libs/partners/openai/tests/
-  integration_tests/
-    chat_models/
-      test_base.py
-      cassettes/
-        test_base/
-          TestChatOpenAICodexStandard.test_invoke.yaml.gz
-          test_chat_openai.yaml.gz
+```bash
+cd libs/partners/openai
+uv run --group test pytest --record-mode=none -m vcr tests/integration_tests/
 ```
 
-Or at the test root:
+### Cassette Location and Naming
 
-```
-libs/partners/openai/tests/cassettes/
-  test_langchain_openai_embeddings_equivalent_to_raw.yaml.gz
-  test_streaming_tool_call_v1_v2_parity.yaml.gz
-```
-
-The fixture `vcr_cassette_dir` (from `conftest.py`) computes the correct directory per test module:
+Cassettes are stored relative to test modules in a `cassettes/` subdirectory. The `vcr_cassette_dir` fixture computes the correct directory per test module:
 
 ```python
 @pytest.fixture(scope="module")
@@ -148,13 +195,17 @@ def vcr_cassette_dir(request: pytest.FixtureRequest) -> str:
     return str(module.parent / "cassettes" / module.stem)
 ```
 
+For a test in `tests/integration_tests/chat_models/test_base.py`, the cassette is named `tests/integration_tests/chat_models/cassettes/test_base/test_invoke.yaml.gz`.
+
+For parameterized tests, VCR appends the parameter value: `test_invoke[gpt-4o-mini].yaml.gz`, `test_invoke[gpt-4o].yaml.gz`.
+
 ## Security: Scrubbing Sensitive Data
 
 VCR cassettes are **committed to git** and **visible to the world** (in public repositories). To prevent accidental exposure of API keys, JWTs, OAuth tokens, and other secrets, LangChain uses a multi-layer scrubbing pipeline.
 
 ### What Gets Redacted
 
-**Headers** (configured in `conftest.py`):
+**Request and Response Headers** (configured in `conftest.py`):
 
 ```python
 _EXTRA_HEADERS = [
@@ -162,8 +213,11 @@ _EXTRA_HEADERS = [
     ("user-agent", "PLACEHOLDER"),
     ("authorization", "PLACEHOLDER"),
     ("cookie", "PLACEHOLDER"),
+    ("set-cookie", "PLACEHOLDER"),
 ]
 ```
+
+All headers are replaced with `**REDACTED**` before recording.
 
 **Request and Response Bodies** (OAuth secret fields):
 
@@ -173,6 +227,7 @@ _OAUTH_SECRET_FIELDS = frozenset({
     "refresh_token",
     "id_token",
     "code",
+    "code_verifier",
     "device_code",
     "client_secret",
 })
@@ -184,9 +239,11 @@ Redaction is applied with specialized handlers:
 - **Form-encoded bodies**: Splits on `&` and redacts matching keys
 - **JWT patterns**: Uses regex to detect and redact JWT-shaped strings anywhere in the body
 
-**Binary payloads** (PNG, JPEG, PDF, audio, etc.) are **skipped**—their magic bytes are detected and the scrubbing stack is bypassed for performance (JWTs and OAuth secrets are ASCII, so binary bodies can't carry them).
+**Binary payloads** (PNG, JPEG, PDF, audio, etc.) are **skipped** for performance—JWTs and OAuth secrets are ASCII, so binary bodies cannot carry them. This saves expensive UTF-8 and regex processing on large image or audio responses.
 
-### Scrubbing Configuration in conftest.py
+### Scrubbing Configuration
+
+Each package's `conftest.py` registers before-record hooks:
 
 ```python
 def remove_request_headers(request: Any) -> Any:
@@ -197,160 +254,27 @@ def remove_request_headers(request: Any) -> Any:
     request.body = _scrub_oauth_secrets(request.body)
     return request
 
+def remove_response_headers(response: dict) -> dict:
+    """Remove sensitive headers and OAuth secrets from the response."""
+    for k in response["headers"]:
+        response["headers"][k] = "**REDACTED**"
+    body = response.get("body")
+    if isinstance(body, dict):
+        body_value = body.get("string")
+        if body_value is not None:
+            body["string"] = _scrub_oauth_secrets(body_value)
+    return response
+
 @pytest.fixture(scope="session")
 def vcr_config() -> dict:
     """Extend the default configuration coming from langchain_tests."""
     config = base_vcr_config()
-    config["match_on"] = ["json_body"]  # Don't match on URI (it's redacted)
-    config.setdefault("filter_headers", []).extend(_EXTRA_HEADERS)
+    config["match_on"] = ["json_body"]  # Custom JSON matching
+    config["serializer"] = "yaml.gz"     # Compress cassettes
     config["before_record_request"] = remove_request_headers
     config["before_record_response"] = remove_response_headers
-    config["serializer"] = "yaml.gz"  # Compress cassettes
     return config
 ```
-
-## Writing Integration Tests
-
-### Basic Structure
-
-Integration tests live in `tests/integration_tests/` (mirroring the layout of unit tests):
-
-```
-libs/partners/openai/tests/
-  unit_tests/
-  integration_tests/
-    chat_models/
-      __init__.py
-      conftest.py
-      test_base.py
-      cassettes/
-```
-
-A minimal integration test using pytest-recording (which auto-hooks VCR):
-
-```python
-import pytest
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage
-
-@pytest.mark.vcr  # Mark test to use VCR
-def test_chat_openai_invoke():
-    chat = ChatOpenAI(model="gpt-4o-mini")
-    response = chat.invoke([HumanMessage(content="Hello")])
-    assert response.content  # Assert the response is non-empty
-```
-
-The `@pytest.mark.vcr` marker tells pytest-recording to automatically:
-
-1. Look for a cassette file named `test_chat_openai_invoke.yaml.gz` in the module's `cassettes/` directory
-2. Use VCR to intercept HTTP calls
-3. Replay the cassette if it exists; record a new one if it doesn't (or if `--record-mode=new_episodes` is passed)
-
-### Markers for Test Classification
-
-**`@pytest.mark.scheduled`**: Marks tests for **live API calls** (no cassette). These run in scheduled CI workflows with real credentials.
-
-```python
-@pytest.mark.scheduled
-def test_chat_openai_streaming_live():
-    """Test streaming with a live API call."""
-    chat = ChatOpenAI(model="gpt-4o-mini", streaming=True)
-    response = chat.invoke("Hello")
-    assert response.content
-```
-
-These tests are **skipped in CI** unless explicitly selected or running in a scheduled job. Locally, they require a valid API key.
-
-**`@pytest.mark.vcr`**: Marks tests for **cassette playback**. VCR is enabled; the cassette is replayed. No API key needed in CI.
-
-```python
-@pytest.mark.vcr
-def test_chat_openai_with_tools():
-    """Test tool calling with a cassette."""
-    chat = ChatOpenAI(model="gpt-4o-mini")
-    tools = [...]
-    response = chat.invoke(..., tools=tools)
-    assert response.tool_calls
-```
-
-**No marker**: Tests without a marker run as **plain unit-like tests**, often for initialization, validation, or offline scenarios. They don't require an API key.
-
-```python
-def test_chat_openai_model_name():
-    """Test model name is set correctly."""
-    chat = ChatOpenAI(model="gpt-4o-mini")
-    assert chat.model_name == "gpt-4o-mini"
-```
-
-### Parameterized Integration Tests
-
-When testing the same scenario against multiple models or configurations, use `pytest.mark.parametrize`:
-
-```python
-import pytest
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage
-
-MODELS = ["gpt-4o-mini", "gpt-4o"]
-
-@pytest.mark.vcr
-@pytest.mark.parametrize("model_name", MODELS)
-def test_chat_models_invoke(model_name: str):
-    """Test invoke on different models."""
-    chat = ChatOpenAI(model=model_name)
-    response = chat.invoke([HumanMessage(content="Hello")])
-    assert response.content
-```
-
-VCR automatically generates separate cassette files for each parameter combination:
-
-```
-cassettes/
-  test_chat_models_invoke[gpt-4o-mini].yaml.gz
-  test_chat_models_invoke[gpt-4o].yaml.gz
-```
-
-When the test runs with `model_name="gpt-4o-mini"`, VCR loads the cassette matching `[gpt-4o-mini]`. This allows testing multiple models with independent recorded interactions.
-
-### Testing Streaming
-
-Stream tests benefit from cassettes because they capture the full stream sequence:
-
-```python
-@pytest.mark.vcr
-def test_chat_openai_streaming():
-    """Test streaming behavior."""
-    chat = ChatOpenAI(model="gpt-4o-mini")
-    chunks = []
-    for chunk in chat.stream("Hello"):
-        chunks.append(chunk)
-    assert len(chunks) > 0
-    assert chunks[-1].content  # Final chunk has content
-```
-
-The cassette records all the streaming HTTP chunks, and VCR replays them in order during playback.
-
-### Testing Error Paths
-
-To test error handling (rate limits, malformed inputs, API errors), you can either:
-
-1. **Record once with a real error** (e.g., using an invalid API key or endpoint), then replay the error response
-2. **Create a cassette manually** with a canned error response for testing
-
-Example: testing a `RateLimitError`:
-
-```python
-@pytest.mark.vcr
-def test_chat_openai_handles_rate_limit():
-    """Test that rate limit errors are handled gracefully."""
-    chat = ChatOpenAI(model="gpt-4o-mini")
-    try:
-        response = chat.invoke("Hello")
-    except Exception as e:
-        assert "rate" in str(e).lower()
-```
-
-The cassette for this test should contain a recorded 429 (Too Many Requests) response from the API.
 
 ## Cassette Management
 
@@ -373,14 +297,14 @@ uv run --group test --group test_integration pytest \
 
 **Prerequisites**:
 - A valid `OPENAI_API_KEY` in `tests/.env`
-- Network access (obviously)
+- Network access
 
 **What happens**:
 1. pytest-recording starts VCR in record mode
 2. Your test runs and makes real HTTP calls to the API
 3. VCR intercepts all requests and responses
 4. Scrubbing functions redact sensitive headers and secrets
-5. The cassette is serialized to YAML, compressed to `.yaml.gz`, and saved
+5. The cassette is serialized to YAML, compressed, and saved to disk
 
 **Commit the cassette**:
 
@@ -391,7 +315,7 @@ git commit -m "Add cassette for chat_openai_invoke integration test"
 
 ### Refreshing Stale Cassettes
 
-When test code changes (e.g., you change the prompt, the model, or the parameters), the cassette may become stale. VCR will attempt to match the new request body against the old cassette; if there's a mismatch, it will fail with a `CannotOverwriteExistingCassetteException` error (in playback mode) or suggest re-recording.
+When test code changes (e.g., prompt, model, parameters), the cassette may become stale. VCR will attempt to match the new request body against the old cassette; if there's a mismatch, it will fail with an error in playback mode.
 
 To refresh:
 
@@ -446,7 +370,7 @@ To inspect a cassette, decompress and read:
 gunzip -c libs/partners/openai/tests/cassettes/test_invoke.yaml.gz | head -50
 ```
 
-Or, for a permanent view:
+Or permanently:
 
 ```bash
 gunzip libs/partners/openai/tests/cassettes/test_invoke.yaml.gz
@@ -457,30 +381,28 @@ gunzip libs/partners/openai/tests/cassettes/test_invoke.yaml.gz
 
 ## Running Integration Tests
 
-### Full Integration Test Suite
+### Full Integration Test Suite (Live)
 
 Run all integration tests against live APIs (requires credentials):
 
 ```bash
 cd libs/partners/openai
-make integration_tests  # Runs full suite with live API calls
+make integration_tests
 ```
 
 This invokes:
 
 ```bash
-uv run --with 'openai>=2.45.0,<3.0.0' --group test --group test_integration pytest \
-  -v --tb=short tests/integration_tests/
-
-uv run --with 'openai>=3.0.0,<4.0.0' --group test --group test_integration pytest \
-  -v --tb=short tests/integration_tests/
+uv run --with 'openai>=2.45.0,<3.0.0' --group test --group test_integration pytest -v --tb=short tests/integration_tests/
+uv run --with 'openai>=3.0.0,<4.0.0' --group test --group test_integration pytest -v --tb=short tests/integration_tests/
+uv run --group test --group test_integration pytest -v --tb=short -n auto --benchmark-disable tests/integration_tests/
 ```
 
-It also smoke-tests a single live request on each supported OpenAI SDK major version (2.x and 3.x).
+The test suite smoke-tests a single live request on each supported SDK major version to ensure both HTTP transport implementations are covered.
 
 ### VCR Cassette Tests (CI Mode)
 
-Run integration tests using only cassettes (no live API calls, no credentials):
+Run integration tests using only cassettes (no live API calls, no credentials needed):
 
 ```bash
 cd libs/partners/openai
@@ -493,9 +415,7 @@ This invokes:
 uv run --group test pytest --record-mode=none -m vcr tests/integration_tests/
 ```
 
-The `--record-mode=none` flag tells VCR to **only replay** cassettes and fail if a cassette is missing (never attempt a live call or record a new one).
-
-This is what CI runs; it ensures cassettes are up-to-date and tests are repeatable without exposing secrets.
+The `--record-mode=none` flag tells VCR to **only replay** cassettes and fail if a cassette is missing. This is what CI runs; it ensures cassettes are up-to-date and tests are repeatable without exposing secrets.
 
 ### Scheduled Integration Tests
 
@@ -506,13 +426,83 @@ cd libs/partners/openai
 make integration_tests
 ```
 
-Only tests marked `@pytest.mark.scheduled` run in these workflows. See [CI/CD Workflows](repo:///openwiki/ci-workflows.md#integration-test-compilation) for details.
+Only tests marked `@pytest.mark.scheduled` run in these workflows (though VCR cassette tests also run). See [CI/CD Workflows: GitHub Actions and Release Process](/openwiki/ci-workflows.md) for details on credential injection and scheduled job setup.
 
-## Streaming and Async Integration Tests
+## Writing Integration Tests
+
+### Basic Structure
+
+A minimal integration test using pytest-recording (which auto-hooks VCR):
+
+```python
+import pytest
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage
+
+@pytest.mark.vcr  # Mark test to use VCR
+def test_chat_openai_invoke():
+    chat = ChatOpenAI(model="gpt-4o-mini")
+    response = chat.invoke([HumanMessage(content="Hello")])
+    assert response.content  # Assert the response is non-empty
+```
+
+The `@pytest.mark.vcr` marker tells pytest-recording to automatically:
+
+1. Look for a cassette file named `test_chat_openai_invoke.yaml.gz` in the module's `cassettes/` directory
+2. Use VCR to intercept HTTP calls
+3. Replay the cassette if it exists; record a new one if it doesn't (or if `--record-mode=new_episodes` is passed)
+
+### Parameterized Integration Tests
+
+When testing the same scenario against multiple models or configurations, use `pytest.mark.parametrize`:
+
+```python
+import pytest
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage
+
+MODELS = ["gpt-4o-mini", "gpt-4o"]
+
+@pytest.mark.vcr
+@pytest.mark.parametrize("model_name", MODELS)
+def test_chat_models_invoke(model_name: str):
+    """Test invoke on different models."""
+    chat = ChatOpenAI(model=model_name)
+    response = chat.invoke([HumanMessage(content="Hello")])
+    assert response.content
+```
+
+VCR automatically generates separate cassette files for each parameter combination:
+
+```
+cassettes/
+  test_chat_models_invoke[gpt-4o-mini].yaml.gz
+  test_chat_models_invoke[gpt-4o].yaml.gz
+```
+
+When the test runs with `model_name="gpt-4o-mini"`, VCR loads the cassette matching `[gpt-4o-mini]`.
+
+### Testing Streaming
+
+Stream tests benefit from cassettes because they capture the full stream sequence:
+
+```python
+@pytest.mark.vcr
+def test_chat_openai_streaming():
+    """Test streaming behavior."""
+    chat = ChatOpenAI(model="gpt-4o-mini")
+    chunks = []
+    for chunk in chat.stream("Hello"):
+        chunks.append(chunk)
+    assert len(chunks) > 0
+    assert chunks[-1].content  # Final chunk has content
+```
+
+The cassette records all streaming HTTP chunks, and VCR replays them in order during playback.
 
 ### Async Tests
 
-Async integration tests work the same as sync tests:
+Async integration tests work identically to sync tests:
 
 ```python
 @pytest.mark.vcr
@@ -525,28 +515,11 @@ async def test_chat_openai_ainvoke():
 
 VCR intercepts the underlying `httpx` (or `requests`) library, so both sync and async HTTP calls are recorded and replayed identically.
 
-### Streaming with `stream_events`
-
-Tests that use `stream_events` (the LangChain event streaming API) also work with cassettes:
-
-```python
-@pytest.mark.vcr
-def test_chat_openai_stream_events():
-    """Test streaming events."""
-    chat = ChatOpenAI(model="gpt-4o-mini")
-    events = []
-    for event in chat.stream_events("Hello", version="v2"):
-        events.append(event)
-    assert len(events) > 0
-```
-
-The underlying HTTP calls are recorded in the cassette; the event structure is replayed exactly.
-
 ## VCR Configuration Details
 
 ### conftest.py Setup
 
-Each package's `conftest.py` configures VCR globally:
+Each package's `conftest.py` configures VCR globally via a `vcr_config()` fixture:
 
 ```python
 from langchain_tests.conftest import CustomPersister, CustomSerializer, base_vcr_config
@@ -555,7 +528,7 @@ from langchain_tests.conftest import CustomPersister, CustomSerializer, base_vcr
 def vcr_config() -> dict:
     """Extend the default configuration coming from langchain_tests."""
     config = base_vcr_config()
-    # Base config:
+    # Base config provides:
     # - record_mode: "once"
     # - filter_headers: ["authorization", "x-api-key", "api-key"]
     # - match_on: ["method", "uri", "body"]
@@ -604,17 +577,96 @@ config["match_on"] = ["json_body"]  # Only match on JSON-parsed body (ignores wh
 
 This allows cassettes to match even if JSON key order differs.
 
-## Integration with CI/CD
+## Standard Test Suite Inheritance
 
-### CI Workflows
+LangChain partner packages inherit a standard suite of integration tests via `ChatModelIntegrationTests` from `langchain_tests.integration_tests`. This allows all chat model providers to run a common set of tests without duplicating test code.
+
+### How It Works
+
+Each partner package defines a test class that inherits from `ChatModelIntegrationTests`:
+
+```python
+# libs/partners/openai/tests/integration_tests/chat_models/test_base_standard.py
+from langchain_tests.integration_tests import ChatModelIntegrationTests
+from langchain_openai import ChatOpenAI
+
+class TestOpenAIStandard(ChatModelIntegrationTests):
+    @property
+    def chat_model_class(self) -> type[BaseChatModel]:
+        return ChatOpenAI
+
+    @property
+    def chat_model_params(self) -> dict:
+        return {"model": "gpt-4o-mini"}
+
+    @property
+    def supports_image_inputs(self) -> bool:
+        return True
+
+    @property
+    def has_tool_calling(self) -> bool:
+        return True
+```
+
+The base class (`ChatModelIntegrationTests`) implements dozens of test methods that exercise standard chat model capabilities: `invoke`, `ainvoke`, `stream`, `astream`, tool calling, structured output, image inputs, streaming events, and more. Each test method is automatically marked with `@pytest.mark.vcr` so cassettes are recorded and replayed.
+
+### Customization Points
+
+Partner implementations override properties to declare:
+
+- **`chat_model_class`**: The model class to instantiate
+- **`chat_model_params`**: Default parameters (model name, API key, etc.)
+- **`supports_*` properties**: Declare which features the model supports (images, tools, JSON mode, etc.)
+- **`has_*` properties**: Declare model capabilities (tool calling, structured output, etc.)
+- **`enable_vcr_tests`**: Boolean to enable/disable VCR integration for the test suite
+- **Custom methods**: Override test methods to provide provider-specific behavior (e.g., handling audio inputs, reasoning models)
+
+### VCR Integration with Standard Tests
+
+Standard test methods inherit VCR integration:
+
+1. Each test method is pre-marked with `@pytest.mark.vcr`
+2. Cassettes are generated automatically with names like `test_invoke.yaml.gz`, `test_invoke[model0].yaml.gz` (for parameterized variants)
+3. Tests run in CI via `make test_vcr --record-mode=none` to validate cassettes are up-to-date
+4. When a partner updates a test (e.g., adds a new model to test), new cassettes are recorded with `--record-mode=new_episodes`
+
+This approach ensures that all LangChain partners maintain consistent test coverage and that changes to the standard test suite (new test methods, new capabilities) are automatically picked up by all partners.
+
+## CI/CD Integration
+
+### Multiple Test Phases
 
 The LangChain CI system runs integration tests at multiple points:
 
-1. **Pull request checks** (`check_diffs.yml`): Compiles integration tests without running them
-2. **VCR cassette tests** (`_test_vcr.yml`): Runs cassette-backed integration tests in playback-only mode
-3. **Scheduled integration tests** (`integration_tests.yml`): Daily remote API testing with live credentials against partner libraries
+1. **Integration test compilation** (`_compile_integration_test.yml`): Validates test syntax and imports without running them. Catches import errors early.
+   ```bash
+   uv run pytest -m compile tests/integration_tests
+   ```
 
-See [CI/CD Workflows: GitHub Actions and Release Process](repo:///openwiki/ci-workflows.md) for full details, including scheduled workflows and record mode management.
+2. **VCR cassette tests** (`_test_vcr.yml`): Runs cassette-backed integration tests in playback-only mode. No API keys needed; catches stale cassettes caused by test input changes.
+   ```bash
+   uv run pytest --record-mode=none -m vcr tests/integration_tests/
+   ```
+
+3. **Scheduled integration tests** (`integration_tests.yml`): Daily remote API testing with live credentials against partner libraries. Only tests marked `@pytest.mark.scheduled` run here (plus cassette tests for validation).
+   ```bash
+   cd libs/partners/openai
+   make integration_tests
+   ```
+
+### Credential Injection in CI
+
+Scheduled integration tests run in a GitHub Actions environment with access to repository secrets. All API keys and provider credentials are injected as environment variables:
+
+```yaml
+env:
+  OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+  # ... dozens of provider keys
+```
+
+These credentials are available to tests via `os.environ["OPENAI_API_KEY"]` etc. The workflow also injects LangSmith tracing credentials for observability and debugging of failures.
 
 ### Cassette Validation in CI
 
@@ -667,63 +719,38 @@ def vcr_config() -> dict:
     return config
 ```
 
-## Standard Test Suite Inheritance
+### Provider-Specific Fixtures
 
-LangChain partner packages inherit a standard suite of integration tests via `ChatModelIntegrationTests` from `langchain_tests.integration_tests`. This allows all chat model providers to run a common set of tests without duplicating test code.
-
-### How It Works
-
-Each partner package defines a test class that inherits from `ChatModelIntegrationTests`:
+Some providers require special setup for cassette playback. For example, OpenAI's Codex tests require OAuth token files that don't exist in CI. The `conftest.py` monkeypatches token providers:
 
 ```python
-# libs/partners/openai/tests/integration_tests/chat_models/test_base_standard.py
-from langchain_tests.integration_tests import ChatModelIntegrationTests
-from langchain_openai import ChatOpenAI
-
-class TestOpenAIStandard(ChatModelIntegrationTests):
-    @property
-    def chat_model_class(self) -> type[BaseChatModel]:
-        return ChatOpenAI
-
-    @property
-    def chat_model_params(self) -> dict:
-        return {"model": "gpt-4o-mini"}
-
-    @property
-    def supports_image_inputs(self) -> bool:
-        return True
-
-    @property
-    def has_tool_calling(self) -> bool:
-        return True
+@pytest.fixture(autouse=True)
+def _fake_codex_oauth_token(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Stub token reads for Codex VCR tests."""
+    if "codex" not in request.module.__name__:
+        return
+    if _vcr_record_mode(request.config) != "none":
+        return
+    
+    fake_token = chatgpt_oauth._ChatGPTToken(
+        access_token="vcr-fake-access-token",
+        refresh_token="vcr-fake-refresh-token",
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=1),
+        account_id="vcr-fake-account-id",
+    )
+    
+    monkeypatch.setattr(
+        chatgpt_oauth._FileChatGPTOAuthTokenProvider,
+        "get_token",
+        lambda self: fake_token,
+    )
 ```
-
-The base class (`ChatModelIntegrationTests`) implements dozens of test methods that exercise standard chat model capabilities: `invoke`, `ainvoke`, `stream`, `astream`, tool calling, structured output, image inputs, and more. Each test method is automatically marked with `@pytest.mark.vcr` so cassettes are recorded and replayed.
-
-### Customization Points
-
-Partner implementations override properties to declare:
-
-- **`chat_model_class`**: The model class to instantiate
-- **`chat_model_params`**: Default parameters (model name, API key, etc.)
-- **`supports_*` properties**: Declare which features the model supports (images, tools, JSON mode, etc.)
-- **`has_*` properties**: Declare model capabilities (tool calling, structured output, etc.)
-- **Custom methods**: Override test methods to provide provider-specific behavior (e.g., handling audio inputs, reasoning models)
-
-### VCR Integration with Standard Tests
-
-Standard test methods inherit VCR integration:
-
-1. Each test method is pre-marked with `@pytest.mark.vcr`
-2. Cassettes are generated automatically with names like `test_invoke.yaml.gz`, `test_invoke[model0].yaml.gz` (for parameterized variants)
-3. Tests run in CI via `make test_vcr --record-mode=none` to validate cassettes are up-to-date
-4. When a partner updates a test (e.g., adds a new model to test), new cassettes are recorded with `--record-mode=new_episodes`
-
-This approach ensures that all LangChain partners maintain consistent test coverage and that changes to the standard test suite (new test methods, new capabilities) are automatically picked up by all partners.
 
 ## Best Practices
 
-1. **Always scrub cassettes**: Use `before_record_request` and `before_record_response` to redact all sensitive data. Inspect cassettes before committing.
+1. **Always scrub cassettes**: Use `before_record_request` and `before_record_response` to redact all sensitive data. Inspect cassettes before committing to verify no secrets leaked.
 
 2. **Commit cassettes**: Cassettes are part of your test suite. Commit them to git so others can run tests without live API access.
 
@@ -731,13 +758,17 @@ This approach ensures that all LangChain partners maintain consistent test cover
 
 4. **Use markers correctly**:
    - `@pytest.mark.vcr` for cassette-backed tests
-   - `@pytest.mark.scheduled` for live-only tests
+   - `@pytest.mark.scheduled` for live-only tests (scheduled CI)
    - No marker for offline tests
 
 5. **Test against multiple models/versions**: Use `@pytest.mark.parametrize` to test multiple configurations and generate separate cassettes for each.
 
-6. **Document cassette dependencies**: If a cassette depends on specific model behavior (e.g., a reasoning model), document it in the test.
+6. **Document cassette dependencies**: If a cassette depends on specific model behavior (e.g., a reasoning model, a specific SDK version), document it in the test.
 
 7. **Refresh cassettes when code changes**: If you modify the test (new prompt, new parameters), refresh the cassette with `--record-mode=new_episodes`.
 
-8. **Review cassette diffs**: When committing cassette updates, review the diff in your PR to ensure no secrets leaked.
+8. **Review cassette diffs**: When committing cassette updates, review the diff in your PR to ensure no secrets leaked and expected behavior is captured.
+
+9. **Isolate test state**: Clean up side effects and avoid test interdependencies. Cassettes should be independent and replayed in any order.
+
+10. **Use conftest fixtures**: Define common setup (API clients, mock data) in `conftest.py` so tests remain focused and readable.

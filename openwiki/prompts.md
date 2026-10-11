@@ -10,6 +10,8 @@ sources:
     resource: repo://libs/core/langchain_core/example_selectors/length_based.py
   - id: openwiki-source-5e027af8cc764d2750129cf1
     resource: repo://libs/core/langchain_core/example_selectors/semantic_similarity.py
+  - id: openwiki-source-269af2bb49a21bd6c548b3f0
+    resource: repo://libs/core/langchain_core/prompt_values.py
   - id: openwiki-source-03d7415879ed05a392edd62d
     resource: repo://libs/core/langchain_core/prompts/base.py
   - id: openwiki-source-15fdd645c1ee76ae559799c1
@@ -22,10 +24,10 @@ sources:
     resource: repo://libs/core/langchain_core/prompts/string.py
   - id: openwiki-source-204b5e61a019044332bd2dd4
     resource: repo://libs/core/langchain_core/prompts/structured.py
-generated: { by: "openwiki/0.5.0", at: "2026-09-03T15:18:34.589Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-10-11T08:26:15.994Z" }
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-28T08:35:20.640Z
+    at: 2026-10-11T08:26:15.994Z
 ---
 
 ## Overview
@@ -157,14 +159,41 @@ except KeyError as e:
     print(f"Error: {e}")
 ```
 
-**Partial application** pre-fills some variables, reducing the required input set:
+### Partial Variables and Lazy Evaluation
+
+**Partial variables** pre-fill some slots during template construction, reducing the set of variables required at format time. They enable lazy evaluation and modular prompt composition.
 
 ```python
 prompt = PromptTemplate.from_template("User: {name}, Question: {question}")
 partial_prompt = prompt.partial(name="Bob")  # Bind 'name'
 output = partial_prompt.format(question="How are you?")
 # Only 'question' is required now
+
+print(prompt.input_variables)  # ['name', 'question']
+print(partial_prompt.input_variables)  # ['question']
 ```
+
+**Key behavior:**
+- Partial variables are specified at construction time via the `partial_variables` parameter or applied later via the `partial()` method.
+- The `partial()` method returns a **new immutable instance**, leaving the original unchanged.
+- Variables provided to `format()` / `invoke()` override partial variable values.
+- Optional variables (from MessagesPlaceholder with `optional=True`) are pre-populated with empty lists as partial defaults.
+
+```python
+# Construct with partial variables
+prompt = PromptTemplate(
+    template="Hello {greeting}, I'm {name}",
+    input_variables=["greeting"],
+    partial_variables={"name": "Alice"}
+)
+# Only greeting is required
+output = prompt.format(greeting="Hi")  # "Hello Hi, I'm Alice"
+
+# Override a partial variable at runtime
+output = prompt.format(greeting="Hello", name="Bob")  # "Hello Hello, I'm Bob"
+```
+
+### Single-Variable Templates
 
 When a prompt has exactly **one** input variable, the template can accept a non-dict argument directly:
 
@@ -408,6 +437,53 @@ result = template.invoke({"input": "What is LangChain?"})
 ```
 
 This is useful for tasks requiring consistent, parseable output (e.g., fact extraction, data classification).
+
+## BasePromptTemplate Interface and PromptValue Types
+
+All prompt templates inherit from `BasePromptTemplate`, which extends `RunnableSerializable`. This base class defines the core interface and state.
+
+### BasePromptTemplate
+
+**Key properties:**
+- `input_variables: list[str]`: Names of variables required at format time.
+- `optional_variables: list[str]`: Names of optional variables (e.g., from MessagesPlaceholder with `optional=True`), auto-inferred and pre-populated with defaults.
+- `partial_variables: Mapping[str, Any]`: Pre-filled variables that reduce required inputs.
+- `output_parser: BaseOutputParser | None`: Optional parser to convert formatted output to structured types.
+- `metadata: dict[str, Any] | None`: Tracing metadata.
+- `tags: list[str] | None`: Tracing tags.
+
+**Validation:**
+- Variable names are automatically extracted from template syntax during initialization.
+- The `"stop"` variable name is reserved and raises a validation error if used.
+- Overlapping input and partial variables raise a validation error.
+
+### PromptValue Types
+
+Prompt templates return instances of `PromptValue`, an abstract base class representing formatted prompt data. Each concrete type can convert to both string (for LLMs) and message list (for chat models) forms.
+
+**StringPromptValue:** Wraps a single string. Converts to a single HumanMessage when requested as messages.
+
+```python
+from langchain_core.prompt_values import StringPromptValue
+
+value = StringPromptValue(text="Hello, world!")
+print(value.to_string())  # "Hello, world!"
+print(value.to_messages())  # [HumanMessage(content="Hello, world!")]
+```
+
+**ChatPromptValue:** Wraps a list of BaseMessage objects (system, human, ai, tool, etc.).
+
+```python
+from langchain_core.prompt_values import ChatPromptValue
+from langchain_core.messages import SystemMessage, HumanMessage
+
+value = ChatPromptValue(messages=[
+    SystemMessage(content="You are helpful."),
+    HumanMessage(content="Hello!"),
+])
+print(value.to_string())  # "System: You are helpful.\nHuman: Hello!"
+print(value.to_messages())  # [SystemMessage(...), HumanMessage(...)]
+```
 
 ## Runnable Interface and Chaining
 

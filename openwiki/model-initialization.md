@@ -6,10 +6,10 @@ tags: [chat-models, factory-pattern, initialization, model-parameters, configura
 sources:
   - id: openwiki-source-c479d4fffee5cf62576699e4
     resource: repo://libs/langchain_v1/langchain/chat_models/base.py
-generated: { by: "openwiki/0.5.0", at: "2026-09-28T08:35:20.640Z" }
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-28T08:35:20.640Z
+    at: 2026-10-11T08:26:15.994Z
+generated: { by: "openwiki/0.5.0", at: "2026-10-11T08:26:15.994Z" }
 ---
 
 ## Overview
@@ -435,6 +435,78 @@ init_chat_model(
     "bedrock:amazon.titan-text-express-v1",
     region_name="us-east-1",
 )
+```
+
+## Credential Resolution
+
+Each provider resolves API credentials through a priority chain:
+
+1. **Explicit parameters**: API keys and endpoints passed to `init_chat_model` kwargs take highest priority
+2. **Environment variables**: Provider-specific variables (e.g., `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`)
+3. **Provider defaults**: Some providers have fallback mechanisms (e.g., Vertex AI uses GCP application default credentials)
+
+For example, OpenAI credential resolution (from `langchain_openai`):
+
+```python
+# Priority:
+# 1. openai_api_key kwarg
+# 2. OPENAI_API_KEY environment variable
+# 3. OpenAI client's auto-detection
+```
+
+For LangSmith gateway:
+
+```python
+# Priority:
+# 1. Explicit kwargs passed to init_chat_model
+# 2. LANGSMITH_GATEWAY_API_KEY environment variable
+# 3. LANGSMITH_API_KEY environment variable (fallback)
+# 4. LANGSMITH_GATEWAY env var for URL (default: https://gateway.smith.langchain.com)
+```
+
+When extending with custom providers, follow the pattern of checking explicit kwargs first, then environment variables with provider-specific prefixes, then relying on the underlying client library's defaults.
+
+## Error Messages and Handling
+
+### ImportError: Missing Package
+
+When a provider's integration package is not installed:
+
+```python
+ImportError: Initializing ChatOpenAI requires the langchain-openai package. 
+Please install it with `pip install langchain-openai`
+```
+
+The error message is constructed by `_import_module()` to suggest the correct pip package name, derived from the module path by converting underscores to hyphens (e.g., `langchain_openai` → `langchain-openai`).
+
+### ValueError: Unknown Provider
+
+If the provider is not registered:
+
+```python
+ValueError: Unsupported provider='unknown_provider'.
+
+Supported model providers are: anthropic, azure_openai, bedrock, ..., xai
+```
+
+For unregistered providers that are still available (via custom packages), you must specify `model_provider` explicitly:
+
+```python
+init_chat_model("my-model", model_provider="my_custom_provider")
+```
+
+### ValueError: Provider Inference Failed
+
+If model name doesn't match any known prefixes and `model_provider` is not specified:
+
+```python
+ValueError: Unable to infer model provider for model='unknown-model-name'. 
+Please specify 'model_provider' directly.
+
+Supported providers: anthropic, azure_openai, bedrock, ..., xai
+
+For help with specific providers, see: 
+https://docs.langchain.com/oss/python/integrations/providers
 ```
 
 ## Testing and Example Patterns

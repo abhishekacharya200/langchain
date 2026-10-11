@@ -8,14 +8,18 @@ sources:
     resource: repo://libs/core/langchain_core/runnables/base.py
   - id: openwiki-source-48e94bbe49ab4f33ba87e9cb
     resource: repo://libs/core/langchain_core/runnables/branch.py
+  - id: openwiki-source-d79ccdb94b1ca7bc5b38d56b
+    resource: repo://libs/core/langchain_core/runnables/configurable.py
   - id: openwiki-source-f9f4c1dc4f9cdf80d824ce15
     resource: repo://libs/core/langchain_core/runnables/fallbacks.py
+  - id: openwiki-source-7a970e5b49bde2fe4f9be3db
+    resource: repo://libs/core/langchain_core/runnables/passthrough.py
   - id: openwiki-source-de6c904bd0171642bd50f6d9
     resource: repo://libs/core/langchain_core/runnables/router.py
-generated: { by: "openwiki/0.5.0", at: "2026-09-28T08:35:20.640Z" }
+generated: { by: "openwiki/0.5.0", at: "2026-10-11T08:26:15.994Z" }
 verified:
   - by: openwiki/0.5.0
-    at: 2026-09-28T08:35:20.640Z
+    at: 2026-10-11T08:26:15.994Z
 ---
 
 
@@ -238,6 +242,240 @@ chain.invoke(5)
 ```
 
 Here, the passthrough preserves the intermediate result for reuse by another branch.
+
+### RunnablePassthrough.assign: Adding Keys to Dict Inputs
+
+Use the `assign` method to passthrough the input dict while adding new computed keys:
+
+```python
+from langchain_core.runnables import RunnablePassthrough
+
+chain = (
+    {"output": RunnableLambda(lambda x: x * 2)}
+    | RunnablePassthrough.assign(
+        doubled_plus_one=lambda x: x["output"] + 1
+    )
+)
+
+chain.invoke(5)
+# {'output': 10, 'doubled_plus_one': 11}
+```
+
+This is equivalent to creating a `RunnableParallel` that includes all input keys plus the new computed ones.
+
+## Parameter Binding: Runtime Value Injection
+
+Parameter binding attaches static values or functions to a Runnable so they're automatically supplied during execution, without requiring them in the input.
+
+### The `bind()` Method: Bind Runtime Arguments
+
+Use `bind()` to attach keyword arguments that will be passed to the underlying Runnable when invoked:
+
+```python
+from langchain_openai import ChatOpenAI
+
+model = ChatOpenAI()
+
+# Bind stop tokens to the model
+bound_model = model.bind(stop=["\n"])
+
+result = bound_model.invoke("Tell me a story")
+# Execution automatically includes stop=["\n"] parameter
+```
+
+This is especially useful for LLMs, where you want to set parameters like `stop`, `temperature`, or `max_tokens` at composition time rather than at invocation time.
+
+### Use Case: Templated Chains
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+prompt = ChatPromptTemplate.from_template("Question: {question}\nAnswer:")
+model = ChatOpenAI().bind(temperature=0.0, max_tokens=100)
+
+chain = prompt | model
+
+# Invoke only needs the question; temperature and max_tokens are bound
+result = chain.invoke({"question": "What is LangChain?"})
+```
+
+### Multiple Bindings
+
+You can chain multiple `bind()` calls or pass multiple arguments:
+
+```python
+model = ChatOpenAI()
+bound_model = (
+    model
+    .bind(temperature=0.7)
+    .bind(stop=["\n", "END"])
+)
+
+# Or in one call:
+bound_model = model.bind(temperature=0.7, stop=["\n", "END"])
+```
+
+## Configurable Fields: Runtime Selection of Runnables
+
+Configurable fields make Runnables reusable by allowing runtime selection of alternative implementations or parameter values without rebuilding the composition.
+
+### `configurable_fields()`: Make Fields Changeable at Runtime
+
+Mark a field as configurable so its value can be selected at invocation time:
+
+```python
+from langchain_core.runnables import ConfigurableField
+from langchain_openai import ChatOpenAI
+
+model = ChatOpenAI(temperature=0.0).configurable_fields(
+    temperature=ConfigurableField(
+        id="llm_temperature",
+        name="LLM Temperature",
+        description="Controls randomness of the model output",
+    )
+)
+
+# Invoke with default temperature (0.0)
+model.invoke("Tell me a story")
+
+# Invoke with runtime temperature override
+model.with_config(
+    configurable={"llm_temperature": 0.9}
+).invoke("Tell me a story")
+```
+
+Configurable fields are useful for:
+- Letting users control model parameters through UI forms or APIs
+- Testing different configurations without code changes
+- Building parameterized chains for multi-tenant systems
+
+### `configurable_alternatives()`: Runtime Choice of Implementations
+
+Choose between different Runnable implementations at runtime:
+
+```python
+from langchain_core.runnables import ConfigurableField
+from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
+
+model = ChatOpenAI().configurable_alternatives(
+    ConfigurableField(id="llm_choice"),
+    default_key="openai",
+    openai=ChatOpenAI(),
+    anthropic=ChatAnthropic(),
+)
+
+# Use default (OpenAI)
+model.invoke("What is AI?")
+
+# Switch to Anthropic at runtime
+model.with_config(
+    configurable={"llm_choice": "anthropic"}
+).invoke("What is AI?")
+```
+
+This pattern is essential for:
+- Supporting multiple LLM providers with fallback logic
+- A/B testing different model implementations
+- Migrating between providers gradually
+
+### Configurable Fields in Chains
+
+Configurable fields propagate through composed chains:
+
+```python
+from langchain_core.prompts import PromptTemplate
+
+prompt = PromptTemplate.from_template("Question: {question}\nAnswer:")
+model = ChatOpenAI(temperature=0.0).configurable_fields(
+    temperature=ConfigurableField(id="temperature")
+)
+
+chain = prompt | model
+
+# Entire chain respects the temperature configuration
+chain.with_config(
+    configurable={"temperature": 0.7}
+).invoke({"question": "Explain quantum computing"})
+```
+
+## Configuration and Binding: RunnableBinding
+
+**`RunnableBinding`** wraps a Runnable and supplies additional arguments, configuration, or lifecycle hooks at invocation time. It is the mechanism behind `bind()`, `with_config()`, `with_listeners()`, and related methods.
+
+### How RunnableBinding Works
+
+When you call `bind()`, `with_config()`, or similar methods, they return a `RunnableBinding` instance:
+
+```python
+from langchain_core.runnables import RunnableLambda
+
+original = RunnableLambda(lambda x: x * 2)
+
+# .bind() returns a RunnableBinding
+bound = original.bind(factor=10)
+
+# .with_config() also returns a RunnableBinding
+configured = original.with_config(tags=["important"])
+
+# You can chain them
+bound_and_configured = original.bind(factor=10).with_config(tags=["important"])
+```
+
+All methods (`invoke`, `batch`, `stream`, etc.) on a `RunnableBinding` delegate to the underlying Runnable while applying the bound arguments and config.
+
+### RunnableBinding Characteristics
+
+- **Transparent**: Preserves the input/output types and schemas of the underlying Runnable
+- **Composable**: Can be piped like any other Runnable
+- **Stackable**: Multiple bindings can be layered
+- **Config-aware**: Merges bound config with runtime config (runtime config takes precedence)
+
+## Graph Construction and Visualization
+
+Every Runnable can be visualized as a directed acyclic graph (DAG) representing its composition structure.
+
+### get_graph(): Build the Computation Graph
+
+```python
+chain = prompt | model | parser
+
+graph = chain.get_graph()
+# graph.nodes: dict of node id -> Node(data, metadata)
+# graph.edges: dict of edge id -> (source_id, target_id)
+
+# Visualize (if graphviz installed)
+graph.print_ascii()
+```
+
+RunnableSequence `get_graph()` builds a graph by:
+1. Creating a graph for each step using that step's `get_graph()`
+2. Trimming the first and last nodes of intermediate steps (since they're already connected)
+3. Adding edges between steps to chain them together
+
+RunnableParallel `get_graph()` shows each branch as parallel paths converging into a single output dict.
+
+### Schemas: Input and Output Types
+
+Every Runnable exposes input and output schemas as Pydantic models:
+
+```python
+chain = prompt | model | parser
+
+input_schema = chain.input_schema
+# Describes the expected input structure
+
+output_schema = chain.output_schema
+# Describes the output structure
+
+# Schemas are used for validation, introspection, and UI generation
+```
+
+RunnableSequence infers schemas by:
+- Tracing the input schema from the first step
+- Tracing the output schema from the last step
+- Applying transformations for `RunnableAssign` and `RunnablePick` steps
 
 ## Async Equivalents
 
@@ -499,106 +737,19 @@ result = chain.invoke(text)
 
 ### Conditional Execution
 
+Combine `RunnableBranch` with other components for conditional workflows:
+
 ```python
 from langchain_core.runnables import RunnableBranch
 
-route_logic = RunnableBranch(
-    (lambda x: "math" in x.lower(), math_chain),
-    (lambda x: "code" in x.lower(), code_chain),
-    general_chain,
+chain = (
+    RunnableLambda(classify_input)
+    | RunnableBranch(
+        (lambda x: x["type"] == "math", math_chain),
+        (lambda x: x["type"] == "writing", writing_chain),
+        default_chain,
+    )
 )
 
-output = route_logic.invoke("How do I calculate factorial?")
+result = chain.invoke({"input": "Solve 2 + 2"})
 ```
-
-## Type Safety and Schema Inference
-
-Chains infer input and output types from their components:
-
-```python
-sequence = add_one | mul_two
-
-# Access inferred schemas
-print(sequence.input_schema)   # Pydantic model for input
-print(sequence.output_schema)  # Pydantic model for output
-print(sequence.input_schema.model_json_schema())
-```
-
-This enables validation and documentation without explicit type annotations.
-
-## Optimization and Flattening
-
-**`RunnableSequence`** automatically flattens nested sequences:
-
-```python
-# These are equivalent:
-chain1 = step1 | step2 | step3
-chain2 = step1 | (step2 | step3)
-chain3 = (step1 | step2) | step3
-```
-
-All produce a single flat sequence with steps `[step1, step2, step3]`, avoiding unnecessary nesting overhead.
-
-## Serialization and Debugging
-
-Composed chains support serialization via the LangChain serialization system, enabling:
-- **Persistence**: Save and load chains
-- **Tracing**: Automatic callback integration for debugging via LangSmith
-- **Inspection**: Use `get_graph()` to visualize chain structure
-
-Enable debug output:
-
-```python
-from langchain_core.globals import set_debug
-
-set_debug(True)  # Print intermediate results
-chain.invoke(input)
-
-# Or use callbacks:
-from langchain_core.tracers import ConsoleCallbackHandler
-
-chain.invoke(input, config={"callbacks": [ConsoleCallbackHandler()]})
-```
-
-## Extension: Custom Runnables
-
-Implement **`Runnable`** to create custom components:
-
-```python
-from langchain_core.runnables import Runnable, RunnableConfig
-from typing import Iterator
-
-class CustomRunnable(Runnable[str, int]):
-    def invoke(self, input: str, config: RunnableConfig | None = None) -> int:
-        return len(input)
-    
-    async def ainvoke(self, input: str, config: RunnableConfig | None = None) -> int:
-        return len(input)
-    
-    def stream(self, input: str, config: RunnableConfig | None = None) -> Iterator[int]:
-        # For streaming support, implement transform
-        for char in input:
-            yield 1
-    
-    async def astream(self, input: str, config: RunnableConfig | None = None):
-        for char in input:
-            yield 1
-
-# Immediately composable
-chain = CustomRunnable() | another_step
-```
-
-Custom Runnables are automatically compatible with all composition operators.
-
-## Summary Table
-
-| Operator | Effect | Example |
-|----------|--------|---------|
-| `\|` | Sequential chaining | `step1 \| step2` |
-| Dict in sequence | Parallel branching | `step1 \| {key1: step2, key2: step3}` |
-| `RunnableBranch` | Conditional routing | `RunnableBranch((cond, runnable), default)` |
-| `RouterRunnable` | Key-based routing | `RouterRunnable({"key": runnable})` |
-| `.batch()` / `.abatch()` | Parallel input processing | `chain.batch([in1, in2])` |
-| `.stream()` / `.astream()` | Token-by-token output | `for chunk in chain.stream(input):` |
-
-See the [Runnables](runnables.md) page for protocol details and method signatures.

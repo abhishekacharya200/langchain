@@ -20,6 +20,7 @@ from langchain_core.messages import (
     RemoveMessage,
     SystemMessage,
     ToolMessage,
+    ToolMessageChunk,
     convert_to_messages,
     convert_to_openai_image_block,
     get_buffer_string,
@@ -1123,6 +1124,10 @@ def test_tool_message_content() -> None:
     assert (
         ToolMessage(Document("foo"), tool_call_id="1").content == "page_content='foo'"  # type: ignore[call-overload]
     )
+    # `None` (or omitted) content should be empty, not the string "None"
+    assert ToolMessage(None, tool_call_id="1").content == ""
+    assert ToolMessage(tool_call_id="1").content == ""
+    assert ToolMessageChunk(None, tool_call_id="1").content == ""
 
 
 def test_tool_message_tool_call_id() -> None:

@@ -199,6 +199,27 @@ class ToolMessageChunk(ToolMessage, BaseMessageChunk):
                 id=self.id,
                 status=_merge_status(self.status, other.status),
             )
+        if isinstance(other, BaseMessageChunk):
+            return self.__class__(
+                tool_call_id=self.tool_call_id,
+                content=merge_content(self.content, other.content),
+                artifact=self.artifact,
+                additional_kwargs=merge_dicts(
+                    self.additional_kwargs, other.additional_kwargs
+                ),
+                response_metadata=merge_dicts(
+                    self.response_metadata, other.response_metadata
+                ),
+                id=self.id,
+                status=self.status,
+            )
+        if isinstance(other, list) and all(
+            isinstance(o, BaseMessageChunk) for o in other
+        ):
+            result: BaseMessageChunk = self
+            for chunk in other:
+                result = result + chunk
+            return result
 
         return super().__add__(other)
 

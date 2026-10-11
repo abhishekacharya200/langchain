@@ -20,6 +20,7 @@ from langchain_core.messages import (
     RemoveMessage,
     SystemMessage,
     ToolMessage,
+    ToolMessageChunk,
     convert_to_messages,
     convert_to_openai_image_block,
     get_buffer_string,
@@ -1123,6 +1124,30 @@ def test_tool_message_content() -> None:
     assert (
         ToolMessage(Document("foo"), tool_call_id="1").content == "page_content='foo'"  # type: ignore[call-overload]
     )
+
+
+def test_tool_message_chunk_add_sequence_and_other_chunk_types() -> None:
+    first = ToolMessageChunk(
+        content="a", tool_call_id="t", artifact={"k": 1}, status="error"
+    )
+    second = ToolMessageChunk(content="b", tool_call_id="t")
+
+    # A sequence of chunks merges the same way as pairwise addition
+    one, two = [second], [second, second]
+    assert first + one == first + second
+    assert first + two == first + second + second
+
+    # Concatenating another chunk type keeps the tool-specific fields
+    merged = first + AIMessageChunk(content="z")
+    assert isinstance(merged, ToolMessageChunk)
+    assert merged.content == "az"
+    assert merged.tool_call_id == "t"
+    assert merged.artifact == {"k": 1}
+    assert merged.status == "error"
+
+    other_id = [ToolMessageChunk(content="c", tool_call_id="other")]
+    with pytest.raises(ValueError, match="different names"):
+        first + other_id
 
 
 def test_tool_message_tool_call_id() -> None:
